@@ -1,0 +1,28 @@
+{
+    "name": "node-red-contrib-dominodb",
+    "version": "0.0.1",
+    "description": "Node-RED nodes to integrate with Domino V10+",
+    "dependencies": {
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/stefanopog/node-red-contrib-dominodb.git"
+    },
+    "license": "Apache-2.0",
+    "keywords": [
+        "domino",
+        "domino10",
+        "domino2025",
+        "node-red"
+    ],
+    "node-red": {
+        "nodes": {
+            "dominodb": "database/database.js",
+            "getDocuments": "getDocuments/getDocuments.js"
+        }
+    },
+    "contributors": [
+    		"Stefano Pogliani <stefano.pogliani@fr.ibm.com>",
+    		"Darren Cacy <dcacyr@us.ibm.com>"
+    ]
+}

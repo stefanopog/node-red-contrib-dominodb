@@ -1,0 +1,261 @@
+<script type="text/javascript">
+    RED.nodes.registerType(
+        "readDocument", 
+        {
+            category: 'Domino10',
+            color: "#F3CD4E",
+            defaults: {
+                application: { 
+                    type: "dominodb", 
+                    required: true
+                },
+                queryOrId: {
+                    value: "fromMsg",
+                    required: true
+                },
+                query: {
+                    value: "",
+                    required: false
+                },
+                defaultOptions: {
+                    value: true,
+                    required: false
+                },
+                maxViewEntries: {
+                    value: 0,
+                    required: false,
+                    validate: RED.validators.number()
+                },
+                maxDocuments: {
+                    value: 0,
+                    required: false,
+                    validate: RED.validators.number()
+                },
+                maxMillisecs: {
+                    value: 0,
+                    required: false,
+                    validate: RED.validators.number()
+                },
+                itemNames: {
+                    value: "",
+                    required: false
+                },
+                onError: {
+                    value: "ON_ERROR_CONTINUE",
+                    required: true
+                },
+                unids: { 
+                    value: "",
+                    required: false
+                },
+                name: { 
+                    value: "" 
+                }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "dominoV10.png",
+            label: function() {
+                return this.name || "Get Documents";
+            },
+            paletteLabel: "Get Documents",
+            align: "left",
+            oneditprepare: function() {
+                _D10_updateQueryOrId();
+                _D10_defaultOptions();
+            }
+        }
+    );
+    function _D10_updateQueryOrId() {
+        switch (document.querySelector("#node-input-queryOrId").value) {
+            case 'query' :
+	            document.querySelector("#_byQuery").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "none";
+                break;
+            case 'ids' :
+                document.querySelector("#_byQuery").style.display = "none";
+                document.querySelector("#_byDocunids").style.display = "inline";
+                break;
+       }
+    };
+
+    function _D10_defaultOptions() {
+        if (document.querySelector("#node-input-defaultOptions").checked){ 
+            document.querySelector("#_defaultOptions").style.display = "none"; 
+        } else { 
+            document.querySelector("#_defaultOptions").style.display = "inline"; 
+        } 
+    }
+  </script>
+  
+  <script type="text/x-red" data-template-name="readDocument">
+    <div class="form-row">
+      <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
+      <input type="text" id="node-input-application">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-queryOrId"><i class="fa fa-arrow-circle-right"></i> Type</label>
+        <select id="node-input-queryOrId" onchange="_D10_updateQueryOrId()">
+            <option value="query">By Query</option>
+            <option value="ids">By docunids</option>
+            <option value="fromMsg">--set from msg.DDB_queryOrId--</option>
+        </select>
+    </div>
+
+    <div id="_byQuery">
+        <div class="form-row">
+            <label for="node-input-query"><i class="fa fa-search"></i> DQL Query</label>
+            <input type="text" id="node-input-query" placeholder="Enter a DQL Query">
+        </div>
+
+        <div class="form-row">
+            <label for="node-input-defaultOptions" style="width:30%"><i class="fa fa-check"></i> Default Options</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="defaultOptions" id="node-input-defaultOptions" onchange="_D10_defaultOptions()"></input>
+        </div>
+        
+        <div id="_defaultOptions">            
+            <div class="form-row">
+                <label for="node-input-maxViewEntries"><i class="fa fa-cogs"></i> Max View Entries</label>
+                <input type="text" id="node-input-maxViewEntries" placeholder="Use 0 for default">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-input-maxDocuments"><i class="fa fa-book"></i> Max Documents</label>
+                <input type="text" id="node-input-maxDocuments" placeholder="Use 0 for default">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-input-maxMillisecs"><i class="fa fa-clock-o"></i> Max MilliSecs</label>
+                <input type="text" id="node-input-maxMillisecs" placeholder="Use 0 for default">
+            </div>   
+        </div>                 
+    </div>
+
+    <div id="_byDocunids">
+        <div class="form-row">
+            <label for="node-input-unids"><i class="fa fa-file"></i> Doc Ids</label>
+            <input type="text" id="node-input-unids" placeholder="comma-separated list of docunids">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-itemNames"><i class="fa fa-th-list"></i> Item Names</label>
+        <input type="text" id="node-input-itemNames" placeholder="comma-separated list of item Names">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-onError"><i class="fa fa-stop-circle"></i> OnError</label>
+        <select id="node-input-onError">
+            <option value="ON_ERROR_CONTINUE">Continue...</option>
+            <option value="ON_ERROR_ABORT_REMAINING">Abort...</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+  </script>
+  
+  <script type="text/x-red" data-help-name="readDocument">
+    <p>
+        A node that allows to retrieve documents from a Domino database (V10 +). It implements the new 
+        <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
+        <br />
+        The node implements the <code>bulkReadDocuments</code> (to get a list of documents using <b>DQL</b>) and the <code>bulkReadDocumentsByUnid</code> (to get a list of documents by their <b>unids</b>) APIs 
+        via the <b>Type selector</b> in the Configuration Panel or via the <code>msg.DDB_queryOrId</code> input parameter.
+    </p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">msg.DDB_queryOrId
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            When you  set the <b>type</b> option in the Configuration Panel to <code>--set from msg.DDB_queryOrId</code>, then you can set the incoming <b>msg.DDB_queryOrId</b> attribute
+            to either <code>query</code> or <code>ids</code> to modify the behavior of the node.
+        </dd>
+
+        <dt class="optional">msg.DDB_itemNames 
+            <span class="property-type">comma separated string</span>
+        </dt>
+        <dd>
+            You can specify a comma separated list of <code>itemNames</code> to be retrieved. 
+            <br />
+            The corresponding value in the Configuration Panel overrides the value of the input attribute.
+            <br />
+            If no value is provided then no items will be retrieved.
+        </dd>
+
+        <dt class="optional">msg.DDB_query 
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            This parameter is only used if a <b>DQL Query</b> is performed.
+            <br />
+            It contains a well formed DQL query.
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_query</code>.
+        </dd>
+
+        <dt class="optional">msg.DDB_unids 
+            <span class="property-type">comma separated string</span>
+        </dt>
+        <dd>
+            This parameter is only used if a <b>a query by IDs</b> is performed.
+            <br />
+            It contains a comma-separated list of <code>@unid</code>s
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_unids</code>.
+        </dd>
+
+        <dt class="optional">msg.DDB_maxViewEntries 
+                <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This parameter is only used if the <code>default Options</code> checkbox in the Configuration Panel is <b>off</b> and if a <b>DQL Query</b> is selected.
+            <br />
+            It must be a positive integer which represents <i>the maximum number of view entries to scan</i>.
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_maxViewEntries</code>. If no value is provided at all, the parameter is not used by the query.
+        </dd>
+
+        <dt class="optional">msg.DDB_maxDocuments 
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This parameter is only used if the <code>default Options</code> checkbox in the Configuration Panel is <b>off</b> and if a <b>DQL Query</b> is selected.
+            <br />
+            It must be a positive integer which represents <i>the maximum number of documents to scan</i>.
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_maxDocuments</code>. If no value is provided at all, the parameter is not used by the query.
+        </dd>
+
+        <dt class="optional">msg.DDB_maxMillisecs 
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This parameter is only used if the <code>default Options</code> checkbox in the Configuration Panel is <b>off</b> and if a <b>DQL Query</b> is selected.
+            <br />
+            It must be a positive integer which represents <i>the maximum number of milliseconds to spend executing the query</i>.
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_maxMillisecs</code>. If no value is provided at all, the parameter is not used by the query.
+        </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>msg.DDB_docs
+            <span class="property-type">Object</span>
+        </dt>
+        <dd>
+            If the query is successfully executed, this parameter holds the answer from the <b>DQL Query.</b>
+        </dd>
+    </dl>
+
+   <h3>References</h3>
+    <ul>
+    </ul>
+  </script>
+  

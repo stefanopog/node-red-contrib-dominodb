@@ -1,0 +1,106 @@
+<script type="text/x-red" data-template-name="dominodb">
+    <div class="form-row">
+        <label for="node-config-input-D10_server" title="The Domino 10 server"><i class="fa fa-server"></i> Server</label>
+        <input type="text" id="node-config-input-D10_server" placeholder="myorg.mydomain.com for instance...">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-D10_port" title="The Domino10 server port"><i class="fa fa-location-arrow"></i> Port</label>
+        <input type="text" id="node-config-input-D10_port" autocomplete="off" placeholder="17847 for instance">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-D10_db" title="The Domino10 Database."><i class="fa fa-database"></i> Database</label>
+        <input type="text" id="node-config-input-D10_db" autocomplete="off" placeholder="myDir/myDB.nsf for instance...">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-displayName" title="App Name"><i class="fa fa-tag"></i> AppName</label>
+        <input type="text" id="node-config-input-displayName" autocomplete="off" placeholder="A name that would remember you this instance">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="dominodb">
+    <p>
+        A node that allows to define a re-usable Application instance. It implements the new 
+        <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
+        <br />
+        The node provides the <code>server</code>, <code>port</code> and <code>database</code> information that allow the APIs to connect to a Domino Application.
+    </p>
+
+    <h3>Details</h3>
+    <p>
+        Each Application node must be associated with an existing Domino database.<br />
+        The Application node requires the following information:
+    </p>
+    <dl class="message-properties">
+        <dt>Server</dt>
+            <dd>This Server hosting the Domino V10+ Proton component. The format is <code>myorg.mydomain.com</code>.</dd>
+        <dt>PortD</dt>
+            <dd>The port that the Domino V10+ Proton component is listening to.</dd>
+        <dt>Database</dt>
+            <dd>The Domino NSF Database that you want to access.</dd>
+    </dl>
+    
+    <h3>References</h3>
+    <ul>
+    </ul>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType(
+        'dominodb',
+        {
+            category: "config",
+            inputs: 1,
+            outputs: 1,
+            icon: "dominoV10.png",
+            color: "#F3CD4E",
+            paletteLabel: "Database",
+            label: function() {
+                return this.displayName;
+            },
+            credentials: {
+                D10_server: { type: "text" },
+                D10_db: { type: "text" },
+                D10_port: { type: "text" }
+            },
+            defaults: {
+                D10_server: {
+                    value: "",
+                    required: true
+                },
+                D10_db: {
+                    value: "",
+                    required: true
+                },
+                D10_port: {
+                    value: "17847",
+                    required: true
+                },
+                displayName: {
+                    value: "",
+                    required: true
+                }
+            },
+            oneditprepare: _D10_db_editInitialize,
+            oneditsave: _D10_db_editSave,
+            oneditcancel: _D10_db_editSave
+
+        }
+    );
+    function _D10_db_editSave() {
+        //
+        //  re-enable the "setups" otherwise the current value will not be stored
+        //
+        $("#setups *").prop('disabled', false);
+        //
+        //  Clean the timer
+        //
+        if (window.icConfigNodeIntervalId) {
+            window.clearTimeout(window.icConfigNodeIntervalId);
+            delete window.icConfigNodeIntervalId;
+        }
+    };
+
+    function _D10_db_editInitialize() {
+    };
+</script>
+
