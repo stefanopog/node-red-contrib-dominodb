@@ -7,7 +7,7 @@ module.exports = function(RED) {
     const getRawBody = require('raw-body');
     const crypto = require('crypto');
     const rp = require("request-promise-native");
-    var __isDebug = process.env.wwsDebug || false;
+    var __isDebug = process.env.d10Debug || false;
 
 
     console.log("*****************************************");
@@ -40,9 +40,6 @@ module.exports = function(RED) {
             }
             done();
         });
-        /*
-        this.getStateMachine().obtain();
-        */
         this.getCredentials = () => {
             return {
                 D10_server: this.D10_server,

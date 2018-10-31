@@ -1,6 +1,6 @@
 <script type="text/javascript">
     RED.nodes.registerType(
-        "readDocument", 
+        "getDocuments", 
         {
             category: 'Domino10',
             color: "#F3CD4E",
@@ -88,7 +88,7 @@
     }
   </script>
   
-  <script type="text/x-red" data-template-name="readDocument">
+  <script type="text/x-red" data-template-name="getDocuments">
     <div class="form-row">
       <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
       <input type="text" id="node-input-application">
@@ -158,7 +158,7 @@
     </div>
   </script>
   
-  <script type="text/x-red" data-help-name="readDocument">
+  <script type="text/x-red" data-help-name="getDocuments">
     <p>
         A node that allows to retrieve documents from a Domino database (V10 +). It implements the new 
         <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)

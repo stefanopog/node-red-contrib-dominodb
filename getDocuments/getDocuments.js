@@ -1,12 +1,12 @@
 module.exports = function(RED) {
-  var __isDebug = process.env.wwsDebug || false;
+  var __isDebug = process.env.d10Debug || false;
 
 
   console.log("*****************************************");
   console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module getDocuments');
   console.log("*****************************************");
 
-function D10_readDocument(config) {
+function D10_getDocuments(config) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
@@ -22,7 +22,7 @@ function D10_readDocument(config) {
     //
     //  Get the dominoDB runtime
     //
-    const { useServer } = require('dominodb');
+    const { useServer } = require('@domino/domino-db');
 
     //
     //  ON Handler
@@ -42,35 +42,42 @@ function D10_readDocument(config) {
       //  Query or Docunids ?
       //
       if ((config.queryOrId.trim() === '') && 
-          ((msg.DDB_queryOrId === undefined) || (msg.DDB_queryOrId.trim() === ''))) {
+          (msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === ''))) {
+            console.log("D10_readDocument: Missing QueryOrID string");
             node.status({fill: "red", shape: "dot", text: "Missing QueryOrID string"});
             node.error("D10_readDocument: Missing QueryOrID string");
-            console.log("D10_readDocument: Missing QueryOrID string");
             return;
       }
-      if (config.queryOrId !== '') {
+      if (config.queryOrId.trim() !== '') {
         if (config.queryOrId === 'fromMsg') {
-          queryOrId = msg.DDB_queryOrId;
+          if (!msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === '')) {
+            console.log("D10_readDocument: Missing QueryOrID string");
+            node.status({fill: "red", shape: "dot", text: "Missing QueryOrID string"});
+            node.error("D10_readDocument: Missing QueryOrID string");
+            return;
+          } else {
+            queryOrId = msg.DDB_queryOrId.trim();
+          }
         } else {
-          queryOrId = config.queryOrId;
+          queryOrId = config.queryOrId.trim();
         }
       } else {
-        queryOrId = msg.DDB_queryOrId;
+        queryOrId = msg.DDB_queryOrId.trim();
       }
       //
       //  Comma-separated list of itemNames
       //
       if ((config.itemNames.trim() === '') && 
-          ((msg.DDB_itemNames === undefined) || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
-            node.status({fill: "yellow", shape: "dot", text: "No Item Names"});
-            node.warn("D10_readDocument: No Item Names");
+          (!msg.DDB_itemNames || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
             console.log("D10_readDocument: No Item Names");
             itemNames = [];
+            node.status({fill: "yellow", shape: "dot", text: "No Item Names"});
+            node.warn("D10_readDocument: No Item Names");
       } else {
         if (config.itemNames.trim() !== '') {
           itemNames = config.itemNames.trim();
         } else {
-          itemNames = msg.DDB_itemNames;
+          itemNames = msg.DDB_itemNames.trim();
         }
         //
         //  Transform comma-separated string into array
@@ -89,9 +96,9 @@ function D10_readDocument(config) {
         //
         if ((config.query.trim() === '') && 
            ((msg.DDB_query === undefined) || (msg.DDB_query.trim() === ''))) {
+            console.log("D10_readDocument: Missing DQL query string");
             node.status({fill: "red", shape: "dot", text: "Missing DQL query string"});
             node.error("D10_readDocument: Missing DQL query string");
-            console.log("D10_readDocument: Missing DQL query string");
             return;
         }
         if (config.query.trim() !== '') {
@@ -108,9 +115,9 @@ function D10_readDocument(config) {
           //
           if ((config.maxViewEntries.trim() === '') && 
             ((msg.DDB_maxViewEntries === undefined) || (msg.DDB_maxViewEntries.trim() === ''))) {
+              console.log("D10_readDocument: maxViewEntries set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxViewEntries set to default"});
               node.warn("D10_readDocument: maxViewEntries set to default");
-              console.log("D10_readDocument: maxViewEntries set to default");
           } else {
             if (config.maxViewEntries !== '') {
               maxViewEntries = config.maxViewEntries;
@@ -127,9 +134,9 @@ function D10_readDocument(config) {
               //
               //  Not numeric, or not integer or negative integer
               //
+              console.log("D10_readDocument: maxViewEntries set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxViewEntries set to default"});
               node.warn("D10_readDocument: maxViewEntries set to default");
-              console.log("D10_readDocument: maxViewEntries set to default");
             }
           }
           //
@@ -137,9 +144,9 @@ function D10_readDocument(config) {
           //
           if ((config.maxDocuments.trim() === '') && 
             ((msg.DDB_maxDocuments === undefined) || (msg.DDB_maxDocuments.trim() === ''))) {
+              console.log("D10_readDocument: maxDocuments set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxDocuments set to default"});
               node.warn("D10_readDocument: maxDocuments set to default");
-              console.log("D10_readDocument: maxDocuments set to default");
           } else {
             if (config.maxDocuments !== '') {
               maxDocuments = config.maxDocuments;
@@ -156,9 +163,9 @@ function D10_readDocument(config) {
               //
               //  Not numeric, or not integer or negative integer
               //
+              console.log("D10_readDocument: maxDocuments set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxDocuments set to default"});
               node.warn("D10_readDocument: maxDocuments set to default");
-              console.log("D10_readDocument: maxDocuments set to default");
             }
           }
           //
@@ -166,9 +173,9 @@ function D10_readDocument(config) {
           //
           if ((config.maxMillisecs.trim() === '') && 
             ((msg.DDB_maxMillisecs === undefined) || (msg.DDB_maxMillisecs.trim() === ''))) {
+              console.log("D10_readDocument: maxMillisecs set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxMillisecs set to default"});
               node.warn("D10_readDocument: maxMillisecs set to default");
-              console.log("D10_readDocument: maxMillisecs set to default");
           } else {
             if (config.maxMillisecs !== '') {
               maxMillisecs = config.maxMillisecs;
@@ -185,9 +192,9 @@ function D10_readDocument(config) {
               //
               //  Not numeric, or not integer or negative integer
               //
+              console.log("D10_readDocument: maxMillisecs set to default");
               node.status({fill: "yellow", shape: "dot", text: "maxMillisecs set to default"});
               node.warn("D10_readDocument: maxMillisecs set to default");
-              console.log("D10_readDocument: maxMillisecs set to default");
             }
           }
         } else {
@@ -206,10 +213,10 @@ function D10_readDocument(config) {
         //
         if ((config.unids.trim() === '') && 
            ((msg.DDB_unids === undefined) || ((typeof msg.DDB_unids) !== 'string') || (msg.DDB_unids.trim() === ''))) {
-              node.status({fill: "red", shape: "dot", text: "Missing Docunids"});
-              node.error("D10_readDocument: Missing Docunids");
-              console.log("D10_readDocument: Missing Docunids");
-              return;
+            console.log("D10_readDocument: Missing Docunids");
+            node.status({fill: "red", shape: "dot", text: "Missing Docunids"});
+            node.error("D10_readDocument: Missing Docunids");
+            return;
         } else {
           if (config.unids.trim() !== '') {
             unids = config.unids;
@@ -269,11 +276,12 @@ function D10_readDocument(config) {
         setTimeout(() => {node.status({});}, 2000);
       })
       .catch(err => {
-        node.status({fill:"red", shape:"dot", text:"Error Getting Results"});
-        node.error('D10_readDocument: Error Getting Results', err);
         console.log('D10_readDocument: Error Getting Results');
         console.log(JSON.stringify(err, ' ', 2));
-      });
+        node.status({fill:"red", shape:"dot", text:"Error Getting Results"});
+        node.error('D10_readDocument: Error Getting Results', err);
+        return;
+     });
     });
     //
     //  CLOSE Handler
@@ -291,7 +299,7 @@ function D10_readDocument(config) {
   //
   //  Node Registration
   //
-  RED.nodes.registerType("readDocument", D10_readDocument);
+  RED.nodes.registerType("getDocuments", D10_getDocuments);
   
   //
   //  Internal Helper Functions

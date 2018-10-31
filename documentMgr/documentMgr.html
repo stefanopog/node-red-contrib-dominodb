@@ -1,0 +1,233 @@
+<script type="text/javascript">
+    RED.nodes.registerType(
+        "documentMgr", 
+        {
+            category: 'Domino10',
+            color: "#F3CD4E",
+            defaults: {
+                application: { 
+                    type: "dominodb", 
+                    required: true
+                },
+                documentOp: {
+                    value: "create",
+                    required: true
+                },
+                unid: { 
+                    value: "",
+                    required: false
+                },
+                itemNames: {
+                    value: "",
+                    required: false
+                },
+                itemValues: {
+                    value: "",
+                    required: false
+                },
+                name: { 
+                    value: "" 
+                }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "dominoV10.png",
+            label: function() {
+                return this.name || "Document Mgr";
+            },
+            paletteLabel: "Document Mgr",
+            align: "left",
+            oneditprepare: function() {
+                _D10_documentOperation();
+            }
+        }
+    );
+    function _D10_documentOperation() {
+        switch (document.querySelector("#node-input-documentOp").value) {
+            case 'read' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "inline";
+	            document.querySelector("#_docItemValues").style.display = "none";
+                break;
+            case 'delete' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "none";
+	            document.querySelector("#_docItemValues").style.display = "none";
+                break;
+            case 'replace' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "none";
+	            document.querySelector("#_docItemValues").style.display = "inline";
+                break;
+            case 'create' :
+                document.querySelector("#_byDocunids").style.display = "none";
+	            document.querySelector("#_docItemNames").style.display = "none";
+	            document.querySelector("#_docItemValues").style.display = "inline";
+                break;
+            case 'replaceItems' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "none";
+	            document.querySelector("#_docItemValues").style.display = "inline";
+                break;
+            case 'deleteItems' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "inline";
+	            document.querySelector("#_docItemValues").style.display = "none";
+                break;
+            case 'fromMsg' :
+                document.querySelector("#_byDocunids").style.display = "inline";
+	            document.querySelector("#_docItemNames").style.display = "none";
+	            document.querySelector("#_docItemValues").style.display = "none";
+                break;
+       }
+    };
+  </script>
+  
+  <script type="text/x-red" data-template-name="documentMgr">
+    <div class="form-row">
+      <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
+      <input type="text" id="node-input-application">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-documentOp"><i class="fa fa-arrow-circle-right"></i> Operation</label>
+        <select id="node-input-documentOp" onchange="_D10_documentOperation()">
+            <option value="read">Read Document</option>
+            <option value="replace">Replace Document</option>
+            <option value="delete">Delete Document</option>
+            <option value="create">Create Document</option>
+            <option value="replaceItems">Replace Items</option>
+            <option value="deleteItems">Delete Items</option>
+            <option value="fromMsg">--set from msg.DDB_documentOp--</option>
+        </select>
+    </div>
+
+    <div class="form-row" id="_byDocunids">
+            <label for="node-input-unid"><i class="fa fa-file"></i> DocUnId</label>
+            <input type="text" id="node-input-unid" placeholder="Document Unique Id">
+    </div>
+
+    <div class="form-row" id="_docItemNames">
+        <label for="node-input-itemNames"><i class="fa fa-th-list"></i> Item Names</label>
+        <input type="text" id="node-input-itemNames" placeholder="comma-separated list of item Names">
+    </div>
+
+    <div class="form-row" id="_docItemValues">
+        <label for="node-input-itemValues"><i class="fa fa-th-list"></i> Item Values</label>
+        <input type="text" id="node-input-itemValues" placeholder="comma-separated list of itemName=itemValue pairs">
+    </div>
+
+
+    <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+  </script>
+  
+  <script type="text/x-red" data-help-name="documentMgr">
+    <p>
+        A node that allows to perform CRUD operations on a <strong>Single Document</strong> in a Domino database (V10 +). 
+        <br />
+        This module implements the following new <strong>NodeJS APIs</strong> 
+        <ul>
+            <li>
+                useDocument
+            </li>
+            <li>
+                read
+            </li>
+            <li>
+                createDocument
+            </li>
+            <li>
+                replace
+            </li>
+            <li>
+                replaceItems
+            </li>
+            <li>
+                delete
+            </li>
+            <li>
+                deleteItems
+            </li>
+        </ul>
+    </p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">msg.DDB_documentOp
+            <span class="property-type">Enumerated</span>
+        </dt>
+        <dd>
+            This input attribute specifiies which operation the node is asked to perform. Valid values are: 
+            <br />
+            <code>read</code>, <code>create</code>, <code>delete</code>,<code>replace</code>, <code>replaceItems</code> and <code>deleteItems</code>.
+            <br /><br />
+            <strong>Note : </strong>this input attribute is <strong>only considered</strong> if the corresponding selector in the Configuration Panel 
+            is set to <code>--set from msg.DDB_documentOp--</code>.
+        </dd>
+
+        <dt class="optional">msg.DDB_unid
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            This attribute allows you to specify the value of the <strong>document unique id</strong> on which to perform the required operation.
+            <br />
+            It is ignored if <code>msg.DDB_documentOp = create</code>.
+            <br /><br />
+            <strong>Note : </strong>The Unique Id value provided in the Configuration Panel overrides the value provided by this attribute.
+        </dd>
+
+        <dt class="optional">msg.DDB_itemNames 
+            <span class="property-type">comma separated string</span>
+        </dt>
+        <dd>
+            You can specify a comma separated list of <code>itemNames</code> to be retrieved by the <code>read</code> operation or deleted by the 
+            <code>deleteItems</code> operation. 
+            <br /><br />
+            <strong>Note : </strong>The corresponding value in the Configuration Panel overrides the value of the input attribute.
+            <br /><br />
+            <strong>Note : </strong>If no value is provided then the corresponding operation will fail.
+        </dd>
+
+        <dt class="optional">msg.DDB_itemValues 
+            <span class="property-type">Array/span>
+        </dt>
+        <dd>
+            You can specify an array of <code>name = value</code> items where <strong>name</strong> is the item name and <strong>value</strong> is its value.
+            <br />
+            This attribute is <strong>only cosidered</strong> if the operation is <code>create</code>, <code>replace</code> or <code>replaceItems</code>.
+            <br /><br />
+            <strong>Note : </strong>The corresponding value in the Configuration Panel overrides the value of the input attribute.
+            <br /><br />
+            <strong>Note : </strong>If using the Configuration Panel, the overall value of the attribute is a <strong>comma separated list</strong> of 
+            <code>name = value</code> pairs. The algorithm splits first on <code>, (comma)</code> and, then, on <code>= (equal sign)</code>. 
+            <br /><br />
+            <strong>Note : </strong>If no value is provided then the corresponding operation will fail.
+        </dd>
+
+    </dl>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>msg.DDB_doc
+            <span class="property-type">Object</span>
+        </dt>
+        <dd>
+            If the operation is successfully executed, this parameter holds the value of the resulting <strong>Domino document.</strong>
+        </dd>
+
+        <dt>msg.DDB_unid
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            If the operation is successfully executed, this parameter holds the value of the <strong>Domino document unique Id.</strong> 
+        </dd>
+    </dl>
+
+   <h3>References</h3>
+    <ul>
+    </ul>
+  </script>
+  
