@@ -1,0 +1,119 @@
+<script type="text/javascript">
+    RED.nodes.registerType(
+        "D10_createDocuments", 
+        {
+            category: 'Domino10',
+            color: "#F3CD4E",
+            defaults: {
+                application: { 
+                    type: "dominodb", 
+                    required: true
+                },
+                itemValuesById: {
+                    value: "",
+                    required: false
+                },
+                onError: {
+                    value: "ON_ERROR_CONTINUE",
+                    required: true
+                },
+                name: { 
+                    value: "" 
+                }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "dominoV10.png",
+            label: function() {
+                return this.name || "Create Documents";
+            },
+            paletteLabel: "Create Documents",
+            align: "left",
+            oneditprepare: function() {}
+        }
+    );
+  </script>
+  
+  <script type="text/x-red" data-template-name="D10_createDocuments">
+    <div class="form-row">
+      <label for="node-input-application" style="width:100px"><i class="fa fa-database"></i> Database</label>
+      <input type="text" id="node-input-application">
+    </div>
+
+    <div id="_itemValuesById" style="display:none">
+        <div class="form-row">
+            <label for="node-input-itemValuesById" style="width:100px"><i class="fa fa-th-list"></i> Item Values by ID</label>
+            <input type="text" id="node-input-itemValuesById" placeholder="comma-separated list of itemName=itemValue pairs with IDs">
+        </div>
+    </div>
+            
+    <div class="form-row">
+        <label for="node-input-onError" style="width:100px"><i class="fa fa-stop-circle"></i> OnError</label>
+        <select id="node-input-onError">
+            <option value="ON_ERROR_CONTINUE">Continue...</option>
+            <option value="ON_ERROR_ABORT_REMAINING">Abort...</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-name" style="width:100px"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+  </script>
+  
+  <script type="text/x-red" data-help-name="D10_createDocuments">
+    <p>
+        A node that allows to create several <strong>documents</strong> in a Domino database (V10 +). It implements the new 
+        <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
+        <br />
+        The node implements the <code>bulKcreateDocuments</code> API to create a list of Documents.
+    </p>
+
+    <h3>Note</h3>
+        If the processing fails or if mandatory inputs are missing, the node terminates in error. 
+        <br />
+        The error object is the <strong>incoming msg object</strong> with the additional <code>msg.DDB_fatal</code> which represents the reason for the error
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">msg.DDB_itemValuesById 
+            <span class="property-type">Array of Objects</span>
+        </dt>
+        <dd>
+            You can specify an array of objects with the following structure:
+            <br />
+            <pre>
+msg.DDB_itemValuesById = [];
+msg.DDB_itemValuesById[0] = {};
+msg.DDB_itemValuesById[0].totale = 789;
+msg.DDB_itemValuesById[0].status = 'pending';
+msg.DDB_itemValuesById[1] = {};
+msg.DDB_itemValuesById[1].amount = 12345;
+msg.DDB_itemValuesById[1].description = 'the desc';
+...
+            </pre>
+            <br />
+            This attribute is <strong>only cosidered</strong> if the operation is <code>delete documents by unids</code> or <code>delete items by unids</code>. 
+            In these situations, the attribute provides replacement values that apply to each document as specified by the <code>'@unid'</code> attribute.
+            <br /><br />
+            <strong>Note : </strong>If any of the objects in the array <strong>does not</strong> provide the <code>'@unid'</code> attribute, the operation
+            will fail.
+            <br /><br />
+            <strong>Note : </strong>If this attribute is not present when required, the operation will fail. 
+        </dd>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>msg.DDB_docs
+            <span class="property-type">Object</span>
+        </dt>
+        <dd>
+            If the operation is successfully executed, this parameter holds the answer from the corresponding API, which is an array where each item corresponds 
+            to the Domino document that has been affected. 
+        </dd>
+    </dl>
+
+   <h3>References</h3>
+    <ul>
+    </ul>
+  </script>
+  

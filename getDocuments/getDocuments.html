@@ -1,6 +1,6 @@
 <script type="text/javascript">
     RED.nodes.registerType(
-        "getDocuments", 
+        "D10_getDocuments", 
         {
             category: 'Domino10',
             color: "#F3CD4E",
@@ -76,6 +76,10 @@
                 document.querySelector("#_byQuery").style.display = "none";
                 document.querySelector("#_byDocunids").style.display = "inline";
                 break;
+            default:
+                document.querySelector("#_byQuery").style.display = "none";
+                document.querySelector("#_byDocunids").style.display = "none";
+                break;
        }
     };
 
@@ -88,7 +92,7 @@
     }
   </script>
   
-  <script type="text/x-red" data-template-name="getDocuments">
+  <script type="text/x-red" data-template-name="D10_getDocuments">
     <div class="form-row">
       <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
       <input type="text" id="node-input-application">
@@ -158,7 +162,7 @@
     </div>
   </script>
   
-  <script type="text/x-red" data-help-name="getDocuments">
+  <script type="text/x-red" data-help-name="D10_getDocuments">
     <p>
         A node that allows to retrieve documents from a Domino database (V10 +). It implements the new 
         <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
@@ -167,16 +171,21 @@
         via the <b>Type selector</b> in the Configuration Panel or via the <code>msg.DDB_queryOrId</code> input parameter.
     </p>
 
+    <h3>Note</h3>
+        If the processing fails or if mandatory inputs are missing, the node terminates in error. 
+        <br />
+        The error object is the <strong>incoming msg object</strong> with the additional <code>msg.DDB_fatal</code> which represents the reason for the error
+
     <h3>Inputs</h3>
     <dl class="message-properties">
         <dt class="optional">msg.DDB_queryOrId
-            <span class="property-type">string</span>
+            <span class="property-type">enumerated</span>
         </dt>
         <dd>
-            When you  set the <b>type</b> option in the Configuration Panel to <code>--set from msg.DDB_queryOrId</code>, then you can set the incoming <b>msg.DDB_queryOrId</b> attribute
-            to either <code>query</code> or <code>ids</code> to modify the behavior of the node.
+            When you set the <b>type</b> option in the Configuration Panel to <code>--set from msg.DDB_queryOrId</code>, then you can set the incoming 
+            <b>msg.DDB_queryOrId</b> attribute to either <code>query</code> or <code>ids</code> to modify the behavior of the node.
         </dd>
-
+        
         <dt class="optional">msg.DDB_itemNames 
             <span class="property-type">comma separated string</span>
         </dt>
@@ -250,7 +259,8 @@
             <span class="property-type">Object</span>
         </dt>
         <dd>
-            If the query is successfully executed, this parameter holds the answer from the <b>DQL Query.</b>
+            If the operation is successfully executed, this parameter holds the answer from the corresponding API, which is an array where each item corresponds 
+            to the Domino document that has been affected. 
         </dd>
     </dl>
 

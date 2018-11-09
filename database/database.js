@@ -1,5 +1,20 @@
+/**
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 module.exports = function(RED) {
     "use strict";
+    /*
     const OAuth2 = require('simple-oauth2');
     const urllib = require("url");
     const http = require("follow-redirects").http;
@@ -7,15 +22,17 @@ module.exports = function(RED) {
     const getRawBody = require('raw-body');
     const crypto = require('crypto');
     const rp = require("request-promise-native");
+    */
     var __isDebug = process.env.d10Debug || false;
+    var __moduleName = 'D10_dominoDB';
 
 
     console.log("*****************************************");
-    console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module DominoDB');
+    console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module ' + __moduleName);
     console.log("*****************************************");
 
 
-    function dominoDB(config) {
+    function D10_dominoDB(config) {
         RED.nodes.createNode(this, config);
 
         this.name = config.displayName;
@@ -25,8 +42,9 @@ module.exports = function(RED) {
         this.D10_port = config.D10_port;
         _log("###############################################");
         _log("Credentials for [" + this.id + "] " + (this.name ? this.name : ""));
-        _logJson("=>", this.credentials);
+        _logJson("", this.credentials);
         _log("###############################################");
+        
         this.on('close', function(removed, done) {
             if (removed) {
                 //
@@ -40,19 +58,53 @@ module.exports = function(RED) {
             }
             done();
         });
+
         this.getCredentials = () => {
-            return {
-                D10_server: this.D10_server,
-                D10_db: this.D10_db,
-                D10_port: this.D10_port,
-                displayName: this.name
-            };
+            return RED.nodes.getCredentials(this.id);
+        };
+    };
+    //
+    //  Internal Helper Functions
+    //
+    //  Common logging function
+    //
+    function _log(logMsg){
+        if (__isDebug) {
+            console.log(__moduleName + " => " + logMsg);
+        };
+    };
+    //
+    //  Common logging function with JSON Objects
+    //
+    function _logJson(logMsg, jsonObj) {
+        if (__isDebug) {
+            console.log(__moduleName + " => " + (logMsg ? logMsg : "") + JSON.stringify(jsonObj, " ", 2));
         };
     };
     
+    //
+    //  Implementing Basic Authentication
+    //
+    RED.httpAdmin.get('/credentials', function(req, res) {
+        if (!req.query.D10_server || !req.query.D10_db || !req.query.D10_port || !req.query.displayName) {
+            res.send(400);
+            return;
+        }
+        var node_id = req.query.id;
+        var credentials = {
+            D10_server: req.query.D10_server,
+            D10_db: req.query.D10_db,
+            D10_port: req.query.D10_port,
+            displayName: req.query.displayName
+        };
+        _logJson("*** NEW CREDENTIALS ****", credentials);
+        RED.nodes.addCredentials(node_id, credentials);
+        res.send(200);
+    });
+
     RED.nodes.registerType(
         "dominodb",
-        dominoDB, 
+        D10_dominoDB, 
         {
             credentials: {
                 D10_server: {type:"text"},
@@ -61,24 +113,5 @@ module.exports = function(RED) {
                 displayName: {type: "text"}
             }
         }
-    );
-   
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function with JSON Objects
-    //
-    function _logJson(logMsg, jsonObject) {
-        if (__isDebug) {
-            console.log("wws-credentials => " + (logMsg ? logMsg : "") + JSON.stringify(jsonObject, " ", 2));
-        };
-    }
-    //
-    //  Common logging function
-    //
-    function _log(logMsg) {
-        if (__isDebug) {
-            console.log("wws-credentials => " + logMsg);
-        };
-    }
+    ); 
 }

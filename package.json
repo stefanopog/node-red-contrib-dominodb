@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-dominodb",
-    "version": "0.1.0",
+    "version": "0.9.0",
     "description": "Node-RED nodes to integrate with Domino V10+",
     "dependencies": {
     },
@@ -19,8 +19,14 @@
     "node-red": {
         "nodes": {
             "dominodb": "database/database.js",
-            "getDocuments": "getDocuments/getDocuments.js",
-            "documentMgr": "documentMgr/documentMgr.js"
+            "D10_documentMgr": "documentMgr/documentMgr.js",
+            "D10_getDocuments": "getDocuments/getDocuments.js",
+            "D10_explainQuery": "explainQuery/explainQuery.js",
+            "D10_deleteDocuments": "deleteDocuments/deleteDocuments.js",
+            "D10_replaceDocuments": "replaceDocuments/replaceDocuments.js",
+            "D10_createDocuments": "createDocuments/createDocuments.js",
+            "documentMgr": "old_documentMgr/documentMgr.js",
+            "getDocuments": "old_getDocuments/getDocuments.js"
         }
     },
     "contributors": [

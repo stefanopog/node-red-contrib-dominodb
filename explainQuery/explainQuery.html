@@ -1,0 +1,91 @@
+<script type="text/javascript">
+    RED.nodes.registerType(
+        "D10_explainQuery", 
+        {
+            category: 'Domino10',
+            color: "#F3CD4E",
+            defaults: {
+                application: { 
+                    type: "dominodb", 
+                    required: true
+                },
+                query: {
+                    value: "",
+                    required: false
+                },
+                name: { 
+                    value: "" 
+                }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "dominoV10.png",
+            label: function() {
+                return this.name || "Explain Query";
+            },
+            paletteLabel: "Explain Query",
+            align: "left",
+            oneditprepare: function() {
+            }
+        }
+    );
+  </script>
+  
+  <script type="text/x-red" data-template-name="D10_explainQuery">
+    <div class="form-row">
+      <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
+      <input type="text" id="node-input-application">
+    </div>
+
+    <div id="_byQuery">
+        <div class="form-row">
+            <label for="node-input-query"><i class="fa fa-search"></i> DQL Query</label>
+            <input type="text" id="node-input-query" placeholder="Enter a DQL Query">
+        </div>
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+  </script>
+  
+  <script type="text/x-red" data-help-name="D10_explainQuery">
+    <p>
+        A node that <strong>explains</strong> a <strong>Domino Query Language</strong> query (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
+        <br />
+        The node implements the <code>explainQuery/code> API.
+    </p>
+
+
+    <h3>Note</h3>
+        If the processing fails or if mandatory inputs are missing, the node terminates in error. 
+        <br />
+        The error object is the <strong>incoming msg object</strong> with the additional <code>msg.DDB_fatal</code> which represents the reason for the error
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">msg.DDB_query 
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            It contains a well formed DQL query.
+            <br />
+            The value in the Configuration Panel overrides the value in <code>msg.DDB_query</code>.
+        </dd>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>msg.DDB_queryExplained
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            The result from the relevant API, explaining the <b>DQL Query.</b>
+        </dd>
+    </dl>
+
+   <h3>References</h3>
+    <ul>
+    </ul>
+  </script>
+  

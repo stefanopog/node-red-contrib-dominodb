@@ -1,6 +1,6 @@
 <script type="text/javascript">
     RED.nodes.registerType(
-        "documentMgr", 
+        "D10_documentMgr", 
         {
             category: 'Domino10',
             color: "#F3CD4E",
@@ -83,7 +83,7 @@
     };
   </script>
   
-  <script type="text/x-red" data-template-name="documentMgr">
+  <script type="text/x-red" data-template-name="D10_documentMgr">
     <div class="form-row">
       <label for="node-input-application"><i class="fa fa-database"></i> Database</label>
       <input type="text" id="node-input-application">
@@ -124,7 +124,7 @@
     </div>
   </script>
   
-  <script type="text/x-red" data-help-name="documentMgr">
+  <script type="text/x-red" data-help-name="D10_documentMgr">
     <p>
         A node that allows to perform CRUD operations on a <strong>Single Document</strong> in a Domino database (V10 +). 
         <br />
@@ -153,6 +153,11 @@
             </li>
         </ul>
     </p>
+
+    <h3>Note</h3>
+        If the processing fails or if mandatory inputs are missing, the node terminates in error. 
+        <br />
+        The error object is the <strong>incoming msg object</strong> with the additional <code>msg.DDB_fatal</code> which represents the reason for the error
 
     <h3>Inputs</h3>
     <dl class="message-properties">
@@ -192,10 +197,30 @@
         </dd>
 
         <dt class="optional">msg.DDB_itemValues 
-            <span class="property-type">Array/span>
+            <span class="property-type">Array of Objects</span>
         </dt>
         <dd>
-            You can specify an array of <code>name = value</code> items where <strong>name</strong> is the item name and <strong>value</strong> is its value.
+            You can specify an array of objects, where each object has two attributes:
+            <ul>
+                <li><strong>name</strong>
+                    <br />
+                    It contains the name of the item
+                </li>
+                <li><strong>value</strong>
+                    <br />
+                    it contains the value of item
+                </li>
+            </ul>
+            <br />
+            The array should have the following structure:
+            <br />
+            <pre>
+msg.DDB_itemValues = [];
+msg.DDB_itemValues[0] = {};
+msg.DDB_itemValues[0].name = 'the name of the item' ;
+msg.DDB_itemValues[0].value = 'the value for the item' ;
+...
+            </pre>
             <br />
             This attribute is <strong>only cosidered</strong> if the operation is <code>create</code>, <code>replace</code> or <code>replaceItems</code>.
             <br /><br />

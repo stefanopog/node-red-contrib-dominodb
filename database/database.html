@@ -60,7 +60,8 @@
             credentials: {
                 D10_server: { type: "text" },
                 D10_db: { type: "text" },
-                D10_port: { type: "text" }
+                D10_port: { type: "text" },
+                displayName: {type: "text"}
             },
             defaults: {
                 D10_server: {
@@ -87,17 +88,16 @@
         }
     );
     function _D10_db_editSave() {
-        //
-        //  re-enable the "setups" otherwise the current value will not be stored
-        //
-        $("#setups *").prop('disabled', false);
-        //
-        //  Clean the timer
-        //
-        if (window.icConfigNodeIntervalId) {
-            window.clearTimeout(window.icConfigNodeIntervalId);
-            delete window.icConfigNodeIntervalId;
-        }
+        var D10_server = $("#node-config-input-D10_server").val();
+        var D10_db = $("#node-config-input-D10_db").val();
+        var D10_port = $("#node-config-input-D10_port").val();
+        var displayName = $("#node-config-input-displayName").val();;
+        var url = 'credentials?' +
+            'id=' + this.id + 
+            '&D10_server=' + D10_server +
+            '&D10_db=' + D10_db +
+            "&D10_port=" + D10_port +
+            "&displayName=" + displayName;
     };
 
     function _D10_db_editInitialize() {
