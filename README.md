@@ -6,14 +6,14 @@ Meet us at [DestinationDomino](ibm.com/destinationdomino) and follow us at [#Dom
 
 ![Domino10](help/dominoV10-big.jpg)
 
-# *Purpose*
+# **Purpose**
 This set of nodes is intended to be provide a simple-to-use NodeRED interface to the the **dominodb nodeJS package**.
 As such, it assumes that the  **dominodb nodeJS package** is already installed [see the Installation section](#Installation) on your NodeRED instance. 
 
 Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
 
-# *Changes*
-### V 0.9.2 Documentation Change
+# **Changes**
+### V 0.9.3 Documentation Change
 * CHanges to this README file
 
 ### V 0.9.0 Major Version
@@ -38,7 +38,7 @@ Full documentation, including sample NodeRed flows using these nodes, is availab
 * Introducing the **Get Documents** node and the **Database** node
 
  
-# *Installation*
+# **Installation**
 
 ### Detailed logging
 When setting the <strong style="color:red">d10Debug</strong> environment variable to **true**, a verbose logging is shown in the terminal console.
@@ -52,11 +52,10 @@ This packages installs using the standard **Manage Palette** feature in the Node
 * A very raw guide to install the **AppDev package** on your local machine or on an **IBM Cloud NodeRed Starter kit** is available in the [docs Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/blob/master/docs/Using%20the%20new%20Domino%20V10%20NodeRED%20nodes%202.pdf) as **Using the new Domino V10 NodeRED nodes 2.pdf**
 
 
-# *Package Details*
+# **Package Details**
 * The inline help for each node provides a detailed explanation of the behavior of each node, including the **input** and **output** parameters.
 * Any fatal error (which comes from processing or from missing input parameters) generate a **NodeRED error**. This error is, mainly, the incoming **msg object** with the addtional `msg.DDB_fatalError` attribute which explains the error. 
   * This is particularly useful if yur node belongs to a flow initiatiated by an **HTTP In node** (thanks to [Ulrich Henkel](mailto:ulrich_henkel@de.ibm.com)) for the input.
-
 
 ### Database node
   * creates a configuration node for a dedicated Domino Application, 
@@ -88,9 +87,9 @@ This packages installs using the standard **Manage Palette** feature in the Node
     * `replace` to completely replace an existing Domino Document with a new one
     * `replaceItems` to modify an existing Domino Document by specifying new values for existing items or new items to be added
 
-# *Limitations*
+# **Limitations**
 * The **Database node** only supports <strong style="color:red">NOT AUTHETICATED</strong> connections
 * There is **no support yet** for the <strong style="color:red">start and count</strong> options when using **DQL**
    
-# *Known Issues*
+# **Known Issues**
 * None at the moment but we are sure you will help us finding them :-) 
