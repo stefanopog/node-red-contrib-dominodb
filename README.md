@@ -13,7 +13,7 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
 
 # *Changes*
-### V 0.9.1 Documentation Change
+### V 0.9.2 Documentation Change
 * CHanges to this README file
 
 ### V 0.9.0 Major Version
@@ -39,6 +39,9 @@ Full documentation, including sample NodeRed flows using these nodes, is availab
 
  
 # *Installation*
+
+### Detailed logging
+When setting the <strong style="color:red">d10Debug</strong> environment variable to **true**, a verbose logging is shown in the terminal console.
 
 ### Automatic Installation
 This packages installs using the standard **Manage Palette** feature in the NodeRed interface.
