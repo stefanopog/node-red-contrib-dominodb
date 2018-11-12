@@ -1,30 +1,24 @@
-/**
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
 module.exports = function(RED) {
   var __isDebug = process.env.d10Debug || false;
-  var __moduleName = 'D10_getDocuments';
 
 
   console.log("*****************************************");
-  console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module ' + __moduleName);
+  console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module getDocuments');
   console.log("*****************************************");
 
-  function D10_getDocuments(config) {
+function D10_getDocuments(config) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
+
+    //
+    //  Check for token on start up
+    //
+    if (!node.application) {
+      node.status({fill: "red", shape: "dot", text: "Database Not Available"});
+      node.error("D10_readDocument: Please configure your Domino DB first!");
+      return;
+    }
     //
     //  Get the dominoDB runtime
     //
@@ -34,6 +28,7 @@ module.exports = function(RED) {
     //  ON Handler
     //
     this.on("input", function(msg) {
+      let creds = node.application.getCredentials();
       let queryOrId = '';
       let query = '';
       let maxViewEntries = 0;
@@ -43,38 +38,22 @@ module.exports = function(RED) {
       let itemNames = null;
       let queryLimits = null;
       let bulkCmdConfig = {};
-
-      //
-      //  Check for token on start up
-      //
-      if (!node.application) {
-        let errString = __moduleName + ": Please configure your Domino DB first!";
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
-        return;
-      }
-      let creds = node.application.getCredentials();
       //
       //  Query or Docunids ?
       //
       if ((config.queryOrId.trim() === '') && 
           (msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === ''))) {
-            let errString = __moduleName + ": Missing QueryOrID string";
-            console.log(_errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing QueryOrID string");
+            node.status({fill: "red", shape: "dot", text: "Missing QueryOrID string"});
+            node.error("D10_readDocument: Missing QueryOrID string");
             return;
       }
       if (config.queryOrId.trim() !== '') {
         if (config.queryOrId === 'fromMsg') {
           if (!msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === '')) {
-            let errString = __moduleName + ": Missing QueryOrID string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing QueryOrID string");
+            node.status({fill: "red", shape: "dot", text: "Missing QueryOrID string"});
+            node.error("D10_readDocument: Missing QueryOrID string");
             return;
           } else {
             queryOrId = msg.DDB_queryOrId.trim();
@@ -85,24 +64,15 @@ module.exports = function(RED) {
       } else {
         queryOrId = msg.DDB_queryOrId.trim();
       }
-      if ((queryOrId !== 'query') && (queryOrId !== 'ids')) {
-        let errString = __moduleName + ": Invalid QueryOrID string : " + queryOrId;
-        console.log(errString);
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
-        return;
-      }
       //
       //  Comma-separated list of itemNames
       //
       if ((config.itemNames.trim() === '') && 
           (!msg.DDB_itemNames || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
-            let warnString = __moduleName + ": No Item Names";
-            console.log(warnString);
+            console.log("D10_readDocument: No Item Names");
             itemNames = [];
-            node.status({fill: "yellow", shape: "dot", text: warnString});
-            node.warn(warnString);
+            node.status({fill: "yellow", shape: "dot", text: "No Item Names"});
+            node.warn("D10_readDocument: No Item Names");
       } else {
         if (config.itemNames.trim() !== '') {
           itemNames = config.itemNames.trim();
@@ -126,11 +96,9 @@ module.exports = function(RED) {
         //
         if ((config.query.trim() === '') && 
            ((msg.DDB_query === undefined) || (msg.DDB_query.trim() === ''))) {
-            let errString = __moduleName + ": Missing DQL query string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing DQL query string");
+            node.status({fill: "red", shape: "dot", text: "Missing DQL query string"});
+            node.error("D10_readDocument: Missing DQL query string");
             return;
         }
         if (config.query.trim() !== '') {
@@ -147,10 +115,9 @@ module.exports = function(RED) {
           //
           if ((config.maxViewEntries.trim() === '') && 
             ((msg.DDB_maxViewEntries === undefined) || (msg.DDB_maxViewEntries.trim() === ''))) {
-              let warnString = __moduleName + ": maxViewEntries set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxViewEntries set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxViewEntries set to default"});
+              node.warn("D10_readDocument: maxViewEntries set to default");
           } else {
             if (config.maxViewEntries !== '') {
               maxViewEntries = config.maxViewEntries;
@@ -167,10 +134,9 @@ module.exports = function(RED) {
               //
               //  Not numeric, or not integer or negative integer
               //
-              let warnString = __moduleName + ": maxViewEntries set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxViewEntries set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxViewEntries set to default"});
+              node.warn("D10_readDocument: maxViewEntries set to default");
             }
           }
           //
@@ -178,10 +144,9 @@ module.exports = function(RED) {
           //
           if ((config.maxDocuments.trim() === '') && 
             ((msg.DDB_maxDocuments === undefined) || (msg.DDB_maxDocuments.trim() === ''))) {
-              let warnString = __moduleName + ": maxDocuments set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxDocuments set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxDocuments set to default"});
+              node.warn("D10_readDocument: maxDocuments set to default");
           } else {
             if (config.maxDocuments !== '') {
               maxDocuments = config.maxDocuments;
@@ -198,10 +163,9 @@ module.exports = function(RED) {
               //
               //  Not numeric, or not integer or negative integer
               //
-              let warnString = __moduleName + ": maxDocuments set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxDocuments set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxDocuments set to default"});
+              node.warn("D10_readDocument: maxDocuments set to default");
             }
           }
           //
@@ -209,10 +173,9 @@ module.exports = function(RED) {
           //
           if ((config.maxMillisecs.trim() === '') && 
             ((msg.DDB_maxMillisecs === undefined) || (msg.DDB_maxMillisecs.trim() === ''))) {
-              let warnString = __moduleName + ": maxMillisecs set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxMillisecs set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxMillisecs set to default"});
+              node.warn("D10_readDocument: maxMillisecs set to default");
           } else {
             if (config.maxMillisecs !== '') {
               maxMillisecs = config.maxMillisecs;
@@ -229,14 +192,13 @@ module.exports = function(RED) {
               //
               //  Not numeric, or not integer or negative integer
               //
-              let warnString = __moduleName + ": maxMillisecs set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
+              console.log("D10_readDocument: maxMillisecs set to default");
+              node.status({fill: "yellow", shape: "dot", text: "maxMillisecs set to default"});
+              node.warn("D10_readDocument: maxMillisecs set to default");
             }
           }
         } else {
-          console.log(__moduleName + ": Using Default Options");
+          console.log("D10_readDocument: Using Default Options");
         }
         //
         //  Prepare the Configuration to be executed
@@ -251,11 +213,9 @@ module.exports = function(RED) {
         //
         if ((config.unids.trim() === '') && 
            ((msg.DDB_unids === undefined) || ((typeof msg.DDB_unids) !== 'string') || (msg.DDB_unids.trim() === ''))) {
-            let errString = __moduleName + ": Missing Docunids";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing Docunids");
+            node.status({fill: "red", shape: "dot", text: "Missing Docunids"});
+            node.error("D10_readDocument: Missing Docunids");
             return;
         } else {
           if (config.unids.trim() !== '') {
@@ -281,11 +241,11 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
-      _logJson("executing with the following options: ", bulkCmdConfig);
+      _logJson("D10_readDocument: executing with the following options: ", bulkCmdConfig);
       const serverConfig = {
         hostName: creds.D10_server, 
         connection: {
-          port: creds.D10_port, 
+          port: creds.D10_port, //17847,
         },
       };
       const databaseConfig = {
@@ -293,65 +253,35 @@ module.exports = function(RED) {
       };
       
       useServer(serverConfig).then(async server => {
-        //
-        //  Get the Domino Database
-        //
-        let db;
-        try {
-          db = await server.useDatabase(databaseConfig);
-        } catch (err) {
-          let errString = __moduleName + ": Error Accessing database config";
-          console.log(errString);
-          console.log(JSON.stringify(databaseConfig, ' ', 2));
-          console.log(__moduleName + ': Error follows : ');
-          console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
-          return;
-        }
+        const db = await server.useDatabase(databaseConfig);
         let docs = null;
-        try {
-          if (queryOrId === "query") {
-            //
-            //  DQL Query
-            //
-            docs = await  db.bulkReadDocuments(bulkCmdConfig);
-          } else {
-            //
-            //  Bulk by IDs
-            //
-            docs = await  db.bulkReadDocumentsByUnid(bulkCmdConfig);
-          }
-          msg.DDB_docs = docs;
-          node.status({fill:"green", shape:"dot", text:"OK"});
-          node.send(msg);
-          _log("succesfully exiting ");
+        if (queryOrId === "query") {
           //
-          //  Reset visual status on success
+          //  DQL Query
           //
-          setTimeout(() => {node.status({});}, 2000);
-        } catch(err) {
-          let errString = __moduleName + ': Error Getting Results';
-          console.log(errString);
-          console.log(JSON.stringify(err, ' ', 2));
-          node.status({fill:"red", shape:"dot", text:errString});
-          msg.DDB_fatal = err;
-          node.error(errString, msg);
-          return;
+          docs = await  db.bulkReadDocuments(bulkCmdConfig);
+        } else {
+          //
+          //  Bulk by IDs
+          //
+          docs = await  db.bulkReadDocumentsByUnid(bulkCmdConfig);
         }
+        msg.DDB_docs = docs;
+        node.status({fill:"green", shape:"dot", text:"OK"});
+        node.send(msg);
+        _logJson("D10_readDocument: succesfully exiting with the following results : ", docs),
+        //
+        //  Reset visual status on success
+        //
+        setTimeout(() => {node.status({});}, 2000);
       })
       .catch(err => {
-        let errString = __moduleName + ': Error accessing Server with the following configuration';
-        console.log(errString);
-        console.log(JSON.stringify(serverConfig, ' ', 2));
-        console.log(__moduleName + ': Error follows : ');
+        console.log('D10_readDocument: Error Getting Results');
         console.log(JSON.stringify(err, ' ', 2));
-        msg.DDB_fatal = err;
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        node.status({fill:"red", shape:"dot", text:"Error Getting Results"});
+        node.error('D10_readDocument: Error Getting Results', err);
         return;
-      });
+     });
     });
     //
     //  CLOSE Handler
@@ -371,23 +301,22 @@ module.exports = function(RED) {
   //
   RED.nodes.registerType("getDocuments", D10_getDocuments);
   
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function
-    //
-  function _log(logMsg){
-    if (__isDebug) {
-        console.log(__moduleName + " => " + logMsg);
-    };
-  };
+  //
+  //  Internal Helper Functions
   //
   //  Common logging function with JSON Objects
   //
-  function _logJson(logMsg, jsonObj) {
+  function _logJson(logMsg, jsonObject) {
+    if (__isDebug) {
+        console.log("D10_getDocuments => " + (logMsg ? logMsg : "") + JSON.stringify(jsonObject, " ", 2));
+    };
+  }
+  //
+  //  Common logging function
+  //
+  function _log(logMsg) {
       if (__isDebug) {
-          console.log(__moduleName + " => " + (logMsg ? logMsg : ""));
-          console.log(JSON.stringify(jsonObj, " ", 2));
+          console.log("D10_getDocuments " + logMsg);
       };
-  };
+  }
 };

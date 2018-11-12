@@ -454,7 +454,12 @@ module.exports = function(RED) {
               docs = await  db.bulkReplaceItemsByUnid(bulkCmdConfig);
             }
           }
+          //
+          //  Building the results
+          //
           msg.DDB_docs = docs.documents;
+          msg.DDB_result = docs;
+          if ((msg.DDB_result) && (msg.DDB_result.documents)) delete(msg.DDB_result.documents);
           node.status({fill:"green", shape:"dot", text:"OK"});
           node.send(msg);
           _log("succesfully exiting ");

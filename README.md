@@ -13,13 +13,21 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
 
 # **Changes**
+### V 0.9.4 Fixes
+* Fixing problem with **deprecated nodes** : in previous version they were identical to the non-deprecated version. Now restored them to V0.1.0
+* Fixing problem with this README file. 
+* Introducing the `msg.DDB_result` output attribute for the **Get Documents**, **Create Documents**, **Delete Documents/Items** and **Replace Documents/Items** nodes.
+  * All the output attributes from the original API **except `documents`** are, now, grouped under the new `msg.DDB_result` attribute
+  * the `msg.DDB_docs` attributes holds the `documents` answser from the API
+  * in this way, you may focus on the `msg.DDB_docs` array to immeditaley get the real results and consult the `msg.DDB_result` object only if you need more infos.
+
 ### V 0.9.3 Documentation Change
 * CHanges to this README file
 
 ### V 0.9.0 Major Version
 * Introducing the **DocumentMgr**, the **Create Documents**, the **Delete Documents/Items**, the **Replace Documents/Items** and the **Explain** nodes.
   * Virtually all APIs are now supported
-* Any fatal error (which comes from processing or from missing input parameters) generate a **NodeRED error**. The generated error is, mainly, the incoming **msg object** with the addtional `msg.DDB_fatalError` attribute which explains the error. 
+* Any fatal error (which comes from processing or from missing input parameters) generate a **NodeRED error**. The generated error is, mainly, the incoming **msg object** with the addtional `msg.DDB_fatal` attribute which explains the error. 
   * You can use a **NodeRED Catch Node** to catch the error that may be generated at runtime.
   * This is particularly useful if yur node belongs to a flow initiatiated by an **HTTP In node** (thanks to [Ulrich Henkel](mailto:ulrich_henkel@de.ibm.com)) for the input.
 * The **old version** of the **GetDocuments** and **DocumentMgr** nodes has been <strong style="color:red">DEPRECATED</strong>. 
@@ -54,7 +62,7 @@ This packages installs using the standard **Manage Palette** feature in the Node
 
 # **Package Details**
 * The inline help for each node provides a detailed explanation of the behavior of each node, including the **input** and **output** parameters.
-* Any fatal error (which comes from processing or from missing input parameters) generate a **NodeRED error**. This error is, mainly, the incoming **msg object** with the addtional `msg.DDB_fatalError` attribute which explains the error. 
+* Any fatal error (which comes from processing or from missing input parameters) generate a **NodeRED error**. This error is, mainly, the incoming **msg object** with the addtional `msg.DDB_fatal` attribute which explains the error. 
   * This is particularly useful if yur node belongs to a flow initiatiated by an **HTTP In node** (thanks to [Ulrich Henkel](mailto:ulrich_henkel@de.ibm.com)) for the input.
 
 ### Database node

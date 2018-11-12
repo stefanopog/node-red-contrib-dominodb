@@ -1,30 +1,22 @@
-/**
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
 module.exports = function(RED) {
   var __isDebug = process.env.d10Debug || false;
-  var __moduleName = 'D10_getDocuments';
-
 
   console.log("*****************************************");
-  console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module ' + __moduleName);
+  console.log("* Debug mode is " + (__isDebug ? "enabled" : "disabled") + ' for module documentMgr');
   console.log("*****************************************");
 
   function D10_documentMgr(config) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
+    //
+    //  Check for token on start up
+    //
+    if (!node.application) {
+      node.status({fill: "red", shape: "dot", text: "Database Not Available"});
+      node.error("D10_readDocument: Please configure your Domino DB first!");
+      return;
+    }
     //
     //  Get the dominoDB runtime
     //
@@ -34,55 +26,50 @@ module.exports = function(RED) {
     //  ON Handler
     //
     this.on("input", function(msg) {
+      let creds = node.application.getCredentials();
+
       const betweenQuotes = /"([^"\\]*(\\.[^"\\]*)*)"/;
       const parExp = /(\S+)\s*=\s*([^\s"]+|"[^"]*")/;
+
       let documentOp = '';
       let unid  = null;
       let itemNames = [];
       let itemValues = [];
       let options = {};
       let options2 = {};
-      //
-      //  Check for token on start up
-      //
-      if (!node.application) {
-        let errString = __moduleName + ": Please configure your Domino DB first!";
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
-        return;
-      }
-      let creds = node.application.getCredentials();
+      const serverConfig = {
+        hostName: creds.D10_server, 
+        connection: {
+          port: creds.D10_port, //17847,
+        },
+      };
+      const databaseConfig = {
+        filePath: creds.D10_db
+      };
       //
       //  Which Operation ?
       //
       if ((config.documentOp.trim() === '') && 
           (!msg.DDB_documentOp || (msg.DDB_documentOp.trim() === ''))) {
-            let errString = __moduleName + ": Missing DocumentOp string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing DocumentOp string");
+            node.status({fill: "red", shape: "dot", text: "Missing DocumentOp string"});
+            node.error("D10_readDocument: Missing DocumentOp string");
             return;
       }
       if (config.documentOp.trim() !== '') {
         if (config.documentOp === 'fromMsg') {
           if (!msg.DDB_documentOp || (msg.DDB_documentOp.trim() === '')) {
-            let errString = __moduleName + ": Missing DocumentOp string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: Missing DocumentOp string");
+            node.status({fill: "red", shape: "dot", text: "Missing DocumentOp string"});
+            node.error("D10_readDocument: Missing DocumentOp string");
             return;
           } else {
             documentOp = msg.DDB_documentOp.trim().toLowerCase();
             const operations = ['read', 'create', 'replace', 'delete', 'replaceItems', 'deleteItems'];
             if (operations.indexOf(documentOp) < 0) {
-              let errString = __moduleName + ": Invalid DocumentOp string : " + documentOp;
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
+              console.log("D10_readDocument: Invalid DocumentOp string : " + documentOp);
+              node.status({fill: "red", shape: "dot", text: "Invalid DocumentOp string : " + documentOp});
+              node.error("D10_readDocument: Invalid DocumentOp string : " + documentOp);
               return;
             }
           }
@@ -98,11 +85,9 @@ module.exports = function(RED) {
       if (documentOp !== 'create') {
         if ((config.unid.trim() === '') && 
             (!msg.DDB_unid || ((typeof msg.DDB_unid) !== 'string') || (msg.DDB_unid.trim() === ''))) {
-              let errString = __moduleName + ": No Document Id";
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
+              console.log("D10_readDocument: No Document Id");
+              node.status({fill: "red", shape: "dot", text: "No Document Id"});
+              node.error("D10_readDocument: No Document Id");
               return;
         } else {
           if (config.unid.trim() !== '') {
@@ -122,15 +107,10 @@ module.exports = function(RED) {
         case 'deleteItems':
           if ((config.itemNames.trim() === '') && 
               (!msg.DDB_itemNames || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
-              //
-              //  No Items names
-              //
-              let errString = __moduleName + ": No Item Names";
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
-              return;
+                console.log("D10_readDocument: No Item Names");
+                node.status({fill: "red", shape: "dot", text: "No Item Names"});
+                node.error("D10_readDocument: No Item Names");
+                return;
           } else {
             if (config.itemNames.trim() !== '') {
               itemNames = config.itemNames.trim();
@@ -160,11 +140,9 @@ module.exports = function(RED) {
             //
             //  No Items to be modified! 
             //
-            let errString = __moduleName + ": No Item Values";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            console.log("D10_readDocument: No Item Values");
+            node.status({fill: "red", shape: "dot", text: "No Item Values"});
+            node.error("D10_readDocument: No Item Values");
             return;
           } else {
             if (config.itemValues.trim() !== '') {
@@ -190,7 +168,7 @@ module.exports = function(RED) {
                 }
               }
               //
-              //  Now we should have processed all the pairs in the config input
+              //  Now we shoudl have processed all the pairs in the config input
               //
             } else {
               //
@@ -239,18 +217,8 @@ module.exports = function(RED) {
           options = {itemNames : itemNames};
           break;
       }
-      _logJson(__moduleName + ": executing operation " + documentOp + " with the following options: ", options);
+      _logJson("D10_documentMgr: executing operation " + documentOp + " with the following options: ", options);
       
-      const serverConfig = {
-        hostName: creds.D10_server, 
-        connection: {
-          port: creds.D10_port, 
-        },
-      };
-      const databaseConfig = {
-        filePath: creds.D10_db
-      };
-
       useServer(serverConfig).then(async server => {
         //
         //  Get the Domino Database
@@ -259,14 +227,12 @@ module.exports = function(RED) {
         try {
           db = await server.useDatabase(databaseConfig);
         } catch (err) {
-          let errString = __moduleName + ": Error Accessing database config";
-          console.log(errString);
+          console.log('D10_readDocument: Error Accessing database config');
           console.log(JSON.stringify(databaseConfig, ' ', 2));
-          console.log(__moduleName + ': Error follows : ');
+          console.log('D10_readDocument: Error follows : ');
           console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          node.status({fill:"red", shape:"dot", text:"Error Accessing database config"});
+          node.error('D10_readDocument: Error Accessing database config', err);
           return;
         }
         //
@@ -277,12 +243,10 @@ module.exports = function(RED) {
           try {
             useDocument = await db.useDocument({unid: unid});
           } catch (err) {
-            let errString = __moduleName + ': Error using document with unique id ' + unid;
-            console.log(errString);
+            console.log('D10_readDocument: Error using document with unique id ' + unid);
             console.log(JSON.stringify(err, ' ', 2));
-            msg.DDB_fatal = err;
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            node.status({fill:"red", shape:"dot", text:"Error using document with unique id " + unid});
+            node.error('D10_readDocument: Error using document with unique id ' + unid, err);
             return;
           }
         }
@@ -298,57 +262,52 @@ module.exports = function(RED) {
               //  Read a Document from useDocument
               //
               myDocument = await useDocument.read(options);
-              _logJson('read document:', myDocument);
+              _logJson('D10_documentMgr: read document:', myDocument);
               break;
             case 'create':
               //
               //  Create a Document and return It
               //
               unid = await db.createDocument(options);
+              console.log('D10_documentMgr: document with uniqueId ' + unid + ' has been succesfully created');
               useDocument = await db.useDocument({unid: unid});
               myDocument = await useDocument.read(options2);
-              _logJson('created document:', myDocument);
+              _logJson('D10_documentMgr: created document:', myDocument);
             case 'replace':
               //
               //  Replace a Document and return It
               //
               await useDocument.replace(options);
               myDocument = await useDocument.read(options2);
-              _logJson('replaced document:', myDocument);
+              _logJson('D10_documentMgr: replaced document:', myDocument);
               break;
             case 'delete':
               await useDocument.delete();
               try {
                 myDocument = await useDocument.read({});
-                let errString = __moduleName + ': Error Deleting document with uniqueId = ' + unid;
-                console.log(errString);
-                msg.DDB_fatal = {message: errString};
-                node.status({fill:"red", shape:"dot", text:errString});
-                node.error(errString, msg);
-                return;
+                isStrangeError = true;
+                _log('D10_documentMgr: ***ERROR** delete document with uniqueId ' + unid + ' FAILED !');
               } catch (e) {
-                _log('document with uniqueId ' + unid + ' has been deleted !');
+                _log('D10_documentMgr: delete document with uniqueId ' + unid + ' has been deleted !');
                 myDocument = {};
               }
               break;
             case 'replaceItems':
               await useDocument.replaceItems(options);
               myDocument = await useDocument.read(options2);
-              _logJson('replaced Items in document:', myDocument);
+              _logJson('D10_documentMgr: replaced document:', myDocument);
               break;
             case 'deleteItems':
               await useDocument.deleteItems(options);
               myDocument = await useDocument.read(options2);
-              _logJson('deleted Items in document:', myDocument);
+              _logJson('D10_documentMgr: replaced document:', myDocument);
               break;
           }
         } catch (err) {
-          let errString = __moduleName + ': Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid;
-          console.log(errString);
+          console.log('D10_readDocument: Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid);
           console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          node.status({fill:"red", shape:"dot", text:'Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid});
+          node.error('D10_readDocument: Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid, err);
           return;
         }
         //
@@ -356,24 +315,29 @@ module.exports = function(RED) {
         //
         msg.DDB_doc = myDocument;
         msg.DDB_unid = unid;
-        node.status({fill:"green", shape:"dot", text:"OK"});
-        node.send(msg);
-        //
-        //  Reset visual status on success
-        //
-        setTimeout(() => {node.status({});}, 2000);
+        if (isStrangeError) {
+          console.log('D10_readDocument: Error Deleting document with uniqueId = ' + unid);
+          node.status({fill:"red", shape:"dot", text:"Error deleting document"});
+          node.error('D10_readDocument: Error deleting document', {unid : unid});
+          return;
+        } else {
+          node.status({fill:"green", shape:"dot", text:"OK"});
+          node.send(msg);
+          //
+          //  Reset visual status on success
+          //
+          setTimeout(() => {node.status({});}, 2000);
+        }
       })
       .catch(err => {
-        let errString = __moduleName + ': Error accessing Server with the following configuration';
-        console.log(errString);
+        console.log('D10_readDocument: Error accessing Server with the following configuration');
         console.log(JSON.stringify(serverConfig, ' ', 2));
-        console.log(__moduleName + ': Error follows : ');
+        console.log('D10_readDocument: Error follows : ');
         console.log(JSON.stringify(err, ' ', 2));
-        msg.DDB_fatal = err;
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        node.status({fill:"red", shape:"dot", text:"Error accessing Server"});
+        node.error('D10_readDocument: Error accessing Server', err);
         return;
-      });
+     });
     });
     //
     //  CLOSE Handler
@@ -392,23 +356,23 @@ module.exports = function(RED) {
   //  Node Registration
   //
   RED.nodes.registerType("documentMgr", D10_documentMgr);
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function
-    //
-    function _log(logMsg){
-      if (__isDebug) {
-          console.log(__moduleName + " => " + logMsg);
-      };
-  };
+  
+  //
+  //  Internal Helper Functions
   //
   //  Common logging function with JSON Objects
   //
-  function _logJson(logMsg, jsonObj) {
-      if (__isDebug) {
-        console.log(__moduleName + " => " + (logMsg ? logMsg : ""));
-        console.log(JSON.stringify(jsonObj, " ", 2));
+  function _logJson(logMsg, jsonObject) {
+    if (__isDebug) {
+        console.log("D10_getDocuments => " + (logMsg ? logMsg : "") + JSON.stringify(jsonObject, " ", 2));
     };
-  };
+  }
+  //
+  //  Common logging function
+  //
+  function _log(logMsg) {
+      if (__isDebug) {
+          console.log("D10_getDocuments " + logMsg);
+      };
+  }
 };

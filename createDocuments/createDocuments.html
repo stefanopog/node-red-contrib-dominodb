@@ -104,11 +104,23 @@ msg.DDB_itemValuesById[1].description = 'the desc';
     <h3>Outputs</h3>
     <dl class="message-properties">
         <dt>msg.DDB_docs
+            <span class="property-type">Array of Objects</span>
+        </dt>
+        <dd>
+            If the operation is successfully executed, this parameter holds the <code>res.documents</code> output attribute of the corresponding API, which is an 
+            array where each item corresponds to the Domino document that has been affected. 
+            <br />
+            In this way, the flow can immediately use the <strong>real results</strong> from the array.
+        </dd>
+
+        <dt>msg.DDB_result
             <span class="property-type">Object</span>
         </dt>
         <dd>
-            If the operation is successfully executed, this parameter holds the answer from the corresponding API, which is an array where each item corresponds 
-            to the Domino document that has been affected. 
+            If the operation is successfully executed, this parameter holds the answer from the corresponding API <strong>except for the documents attribute</strong> 
+            (which is delivered as the <code>msg.DDB_docs</code> output attribute).
+            <br />
+            This output may be consulted if the flow requires more information from the API.
         </dd>
     </dl>
 
