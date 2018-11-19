@@ -3,3 +3,4 @@ getDocuments/.DS_Store
 database/icons/.DS_Store
 database/.DS_Store
 .vscode
+.gitignore
