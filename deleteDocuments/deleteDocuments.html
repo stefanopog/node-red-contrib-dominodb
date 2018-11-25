@@ -1,9 +1,9 @@
+<script type="text/javascript">
 /*
 Copyright IBM All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
-<script type="text/javascript">
     RED.nodes.registerType(
         "D10_deleteDocuments", 
         {
@@ -45,6 +45,38 @@ SPDX-License-Identifier: Apache-2.0
                     required: false,
                     validate: RED.validators.number()
                 },
+                startValue: {
+                    value: 0,
+                    required: false,
+                    validate: RED.validators.number()
+                },
+                countValue: {
+                    value: 0,
+                    required: false,
+                    validate: function(v) {
+                        debugger;
+                        if (v) {
+                            if (Number.isInteger(Number(v))) {
+                                if ((v >=0) && (v <= 200)) {
+                                    return true;
+                                } else {
+                                    alert('Number ' + v + ' is out of range. Values between 0 and 200 are allowed. This will generate an error at runtime');
+                                    return false;
+                                }
+                            } else {
+                                alert('value ' + v + ' is not an integer. This will generate an error at runtime');
+                                return false;
+                            }
+                        } else {
+                            //alert('UNDEFINED !!');
+                            return true;
+                        }
+                    }
+                },
+                displayResults: {
+                    value: "Default",
+                    required: false
+                },
                 itemNames: {
                     value: "",
                     required: false
@@ -70,9 +102,13 @@ SPDX-License-Identifier: Apache-2.0
             paletteLabel: "Delete Docs/Items",
             align: "left",
             oneditprepare: function() {
+                if (document.querySelector('#node-input-displayResults').value === '') {
+                    $('#node-input-displayResults').val('Default');
+                }
                 _D10_updateQueryOrId_delete();
                 _D10_updateDocumentsOrItems_delete();
                 _D10_defaultOptions_delete();
+                _D10_selectDisplayResults_delete();
             }
         }
     );
@@ -114,6 +150,20 @@ SPDX-License-Identifier: Apache-2.0
             document.querySelector("#_defaultOptions").style.display = "inline"; 
         } 
     }
+
+    function _D10_selectDisplayResults_delete() {
+        switch (document.querySelector('#node-input-displayResults').value) {
+            case 'byPage' :
+            case 'fromMsg' :
+                document.querySelector('#_byPage').style.display = 'inline';
+                break;
+            case 'Default' :
+            case 'All' :
+            default :
+                document.querySelector('#_byPage').style.display = 'none';
+                break;
+        }
+    };
   </script>
   
   <script type="text/x-red" data-template-name="D10_deleteDocuments">
@@ -146,6 +196,28 @@ SPDX-License-Identifier: Apache-2.0
             <input type="text" id="node-input-query" placeholder="Enter a DQL Query">
         </div>
 
+        <div class="form-row">
+            <label for="node-input-displayResults"><i class="fa fa-plus-square"></i> Results</label>
+            <select id="node-input-displayResults" onchange="_D10_selectDisplayResults_delete()">
+                <option value="Default">Default</option>
+                <option value="All">All documents</option>
+                <option value="byPage">by page</option>
+                <option value="fromMsg">--set from msg.DDB_displayResults--</option>
+            </select>
+        </div>
+    
+        <div id="_byPage">            
+            <div class="form-row">
+                <label for="node-input-startValue"><i class="fa fa-play"></i> Start</label>
+                <input type="text" id="node-input-startValue" placeholder="start index">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-input-countValue"><i class="fa fa-stop"></i> Count</label>
+                <input type="text" id="node-input-countValue" placeholder="Count">
+            </div>
+        </div>                 
+    
         <div class="form-row">
             <label for="node-input-defaultOptions" style="width:30%"><i class="fa fa-check"></i> Default Options</label>
             <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="defaultOptions" id="node-input-defaultOptions" onchange="_D10_defaultOptions_delete()"></input>
@@ -223,6 +295,16 @@ SPDX-License-Identifier: Apache-2.0
         </ul>
         The <b>Selectors</b> in the Configuration Panel or the <code>msg.DDB_queryOrId</code> and <code>msg.DDB_documentsOrItems</code> input parameters allow
         to properly select the behavior.
+        <br />
+        When a <strong>DQL Query</strong> is selected, the operation can affec:
+        <ul>
+            <li>the <strong>Default</strong> number of Documents (as specified by the API)
+            </li>
+            <li><strong>All</strong> the documents matching the query
+            </li>
+            <li>a <strong>subset</strong> of Documents specified by the <code>start</code> and <code>count</code> parameters
+            </li>
+        </ul>
     </p>
 
     <h3>Note</h3>
@@ -285,6 +367,38 @@ SPDX-License-Identifier: Apache-2.0
             The value in the Configuration Panel overrides the value in <code>msg.DDB_unids</code>.
         </dd>
 
+        <dt class="optional">msg.DDB_displayResults
+            <span class="property-type">enumerated</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected.
+            <br />
+            When you set the <b>Results</b> option in the Configuration Panel to <code>--set from msg.DDB_displayResults</code>, then you can set the incoming 
+            <b>msg.DDB_displayResults</b> attribute to <code>Default</code> or <code>All</code> or <code>byPage</code> to modify the behavior of the node.
+            <br />
+            If <code>All</code> is selected, NodeRed may not display the whole set of results in the Debug console (by default, only the first 1000). 
+        </dd>
+
+        <dt class="optional">msg.DDB_startValue
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected and <code>byPage</code> is selected for the 
+            <strong>msg.DDB_displayResults</strong> option.
+            <br />
+            It defines the starting index for the results to be returned. 
+        </dd>
+
+        <dt class="optional">msg.DDB_countValue
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected and <code>byPage</code> is selected for the 
+            <strong>>msg.DDB_displayResults</strong> option.
+            <br />
+            It defines the number of Documents to be returned. Maximum number is 200.
+        </dd>
+    
         <dt class="optional">msg.DDB_maxViewEntries 
                 <span class="property-type">integer</span>
         </dt>

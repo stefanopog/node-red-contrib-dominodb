@@ -2,5 +2,7 @@ getDocuments/icons/.DS_Store
 getDocuments/.DS_Store
 database/icons/.DS_Store
 database/.DS_Store
-.vscode
+.DS_Store
+.vscode/*
 .gitignore
+.project

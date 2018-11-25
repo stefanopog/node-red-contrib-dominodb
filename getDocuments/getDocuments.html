@@ -1,9 +1,9 @@
+<script type="text/javascript">
 /*
 Copyright IBM All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
-<script type="text/javascript">
     RED.nodes.registerType(
         "D10_getDocuments", 
         {
@@ -41,6 +41,38 @@ SPDX-License-Identifier: Apache-2.0
                     required: false,
                     validate: RED.validators.number()
                 },
+                startValue: {
+                    value: 0,
+                    required: false,
+                    validate: RED.validators.number()
+                },
+                countValue: {
+                    value: 0,
+                    required: false,
+                    validate: function(v) {
+                        debugger;
+                        if (v) {
+                            if (Number.isInteger(Number(v))) {
+                                if ((v >=0) && (v <= 200)) {
+                                    return true;
+                                } else {
+                                    alert('Number ' + v + ' is out of range. Values between 0 and 200 are allowed. This will generate an error at runtime');
+                                    return false;
+                                }
+                            } else {
+                                alert('value ' + v + ' is not an integer. This will generate an error at runtime');
+                                return false;
+                            }
+                        } else {
+                            //alert('UNDEFINED !!');
+                            return true;
+                        }
+                    }
+                },
+                displayResults: {
+                    value: "Default",
+                    required: false
+                },
                 itemNames: {
                     value: "",
                     required: false
@@ -66,8 +98,12 @@ SPDX-License-Identifier: Apache-2.0
             paletteLabel: "Get Documents",
             align: "left",
             oneditprepare: function() {
+                if (document.querySelector('#node-input-displayResults').value === '') {
+                    $('#node-input-displayResults').val('Default');
+                }
                 _D10_updateQueryOrId();
                 _D10_defaultOptions();
+                _D10_selectDisplayResults();
             }
         }
     );
@@ -94,7 +130,21 @@ SPDX-License-Identifier: Apache-2.0
         } else { 
             document.querySelector("#_defaultOptions").style.display = "inline"; 
         } 
-    }
+    };
+
+    function _D10_selectDisplayResults() {
+        switch (document.querySelector('#node-input-displayResults').value) {
+            case 'byPage' :
+            case 'fromMsg' :
+                document.querySelector('#_byPage').style.display = 'inline';
+                break;
+            case 'Default' :
+            case 'All' :
+            default :
+                document.querySelector('#_byPage').style.display = 'none';
+                break;
+        }
+    };
   </script>
   
   <script type="text/x-red" data-template-name="D10_getDocuments">
@@ -119,10 +169,32 @@ SPDX-License-Identifier: Apache-2.0
         </div>
 
         <div class="form-row">
+            <label for="node-input-displayResults"><i class="fa fa-plus-square"></i> Results</label>
+            <select id="node-input-displayResults" onchange="_D10_selectDisplayResults()">
+                <option value="Default">Default</option>
+                <option value="All">All documents</option>
+                <option value="byPage">by page</option>
+                <option value="fromMsg">--set from msg.DDB_displayResults--</option>
+            </select>
+        </div>
+    
+        <div id="_byPage">            
+            <div class="form-row">
+                <label for="node-input-startValue"><i class="fa fa-play"></i> Start</label>
+                <input type="text" id="node-input-startValue" placeholder="start index">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-input-countValue"><i class="fa fa-stop"></i> Count</label>
+                <input type="text" id="node-input-countValue" placeholder="Count">
+            </div>
+        </div>                 
+
+        <div class="form-row">
             <label for="node-input-defaultOptions" style="width:30%"><i class="fa fa-check"></i> Default Options</label>
             <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="defaultOptions" id="node-input-defaultOptions" onchange="_D10_defaultOptions()"></input>
         </div>
-        
+                
         <div id="_defaultOptions">            
             <div class="form-row">
                 <label for="node-input-maxViewEntries"><i class="fa fa-cogs"></i> Max View Entries</label>
@@ -172,8 +244,19 @@ SPDX-License-Identifier: Apache-2.0
         A node that allows to retrieve documents from a Domino database (V10 +). It implements the new 
         <strong>NodeJS APIs</strong> that allow you to interact with the <strong>Domino Query Language</strong> language (see <a href="https://www-01.ibm.com/support/docview.wss?uid=ibm10729047">here</a>.)
         <br />
-        The node implements the <code>bulkReadDocuments</code> (to get a list of documents using <b>DQL</b>) and the <code>bulkReadDocumentsByUnid</code> (to get a list of documents by their <b>unids</b>) APIs 
-        via the <b>Type selector</b> in the Configuration Panel or via the <code>msg.DDB_queryOrId</code> input parameter.
+        The node implements the <code>bulkReadDocuments</code> (to get a list of documents using <b>DQL</b>) and the <code>bulkReadDocumentsByUnid</code> (to get a 
+        list of documents by their <b>unids</b>) APIs via the <b>Type selector</b> in the Configuration Panel or via the <code>msg.DDB_queryOrId</code> input 
+        parameter.
+        <br />
+        When a <strong>DQL Query</strong> is selected, the query can return:
+        <ul>
+            <li>the <strong>Default</strong> number of Documents (as specified by the API)
+            </li>
+            <li><strong>All</strong> the documents matching the query
+            </li>
+            <li>a <strong>subset</strong> of Documents specified by the <code>start</code> and <code>count</code> parameters
+            </li>
+        </ul>
     </p>
 
     <h3>Note</h3>
@@ -199,7 +282,7 @@ SPDX-License-Identifier: Apache-2.0
             <br />
             The corresponding value in the Configuration Panel overrides the value of the input attribute.
             <br />
-            If no value is provided then no items will be retrieved.
+            If no value is provided then an error is generated and the operation fails.
         </dd>
 
         <dt class="optional">msg.DDB_query 
@@ -224,8 +307,40 @@ SPDX-License-Identifier: Apache-2.0
             The value in the Configuration Panel overrides the value in <code>msg.DDB_unids</code>.
         </dd>
 
+        <dt class="optional">msg.DDB_displayResults
+            <span class="property-type">enumerated</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected.
+            <br />
+            When you set the <b>Results</b> option in the Configuration Panel to <code>--set from msg.DDB_displayResults</code>, then you can set the incoming 
+            <b>msg.DDB_displayResults</b> attribute to <code>Default</code> or <code>All</code> or <code>byPage</code> to modify the behavior of the node.
+            <br />
+            If <code>All</code> is selected, NodeRed may not display the whole set of results in the Debug console (by default, only the first 1000). 
+        </dd>
+
+        <dt class="optional">msg.DDB_startValue
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected and <code>byPage</code> is selected for the 
+            <strong>msg.DDB_displayResults</strong> option.
+            <br />
+            It defines the starting index for the results to be returned. 
+        </dd>
+
+        <dt class="optional">msg.DDB_countValue
+            <span class="property-type">integer</span>
+        </dt>
+        <dd>
+            This option is only available if a <strong>DQL Query</strong> is selected and <code>byPage</code> is selected for the 
+            <strong>>msg.DDB_displayResults</strong> option.
+            <br />
+            It defines the number of Documents to be returned. Maximum number is 200.
+        </dd>
+        
         <dt class="optional">msg.DDB_maxViewEntries 
-                <span class="property-type">integer</span>
+            <span class="property-type">integer</span>
         </dt>
         <dd>
             This parameter is only used if the <code>default Options</code> checkbox in the Configuration Panel is <b>off</b> and if a <b>DQL Query</b> is selected.

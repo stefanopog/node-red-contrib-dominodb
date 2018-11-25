@@ -3,6 +3,7 @@ Copyright IBM All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
+
 module.exports = function(RED) {
   var __isDebug = process.env.d10Debug || false;
   var __moduleName = 'D10_deleteDocuments';
@@ -16,6 +17,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
+    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatorInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -28,9 +30,9 @@ module.exports = function(RED) {
       let queryOrId = '';
       let documentsOrItems = '';
       let query = '';
-      let maxViewEntries = 0;
-      let maxDocuments = 0;
-      let maxMillisecs = 0;
+      let displayResults = '';
+      let startValue = 0;
+      let countValue = 100;
       let unids = null;
       let itemNames = null;
       let queryLimits = null;
@@ -39,120 +41,35 @@ module.exports = function(RED) {
       //  Check for token on start up
       //
       if (!node.application) {
-        let errString = __moduleName + ": Please configure your Domino DB first!";
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        __logError(__moduleName, "Please configure your Domino DB first!", null, null, msg, node);
         return;
       }
       let creds = node.application.getCredentials();
       //
       //  Query or Docunids ?
       //
-      if ((config.queryOrId.trim() === '') && 
-          (msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === ''))) {
-            let errString = __moduleName + ": Missing QueryOrID string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-      }
-      if (config.queryOrId.trim() !== '') {
-        if (config.queryOrId === 'fromMsg') {
-          if (!msg.DDB_queryOrId || (msg.DDB_queryOrId.trim() === '')) {
-            let errString = __moduleName + ": Missing QueryOrID string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-          } else {
-            queryOrId = msg.DDB_queryOrId.trim();
-          }
-        } else {
-          queryOrId = config.queryOrId.trim();
-        }
-      } else {
-        queryOrId = msg.DDB_queryOrId.trim();
-      }
-      if ((queryOrId !== 'query') && (queryOrId !== 'ids')) {
-        let errString = __moduleName + ": Invalid QueryOrID string : " + queryOrId;
-        console.log(errString);
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
-        return;
-      }
+      queryOrId = __getMandatorInputFromSelect(__moduleName, config.queryOrId, msg.DDB_queryOrId, 'queryOrId', ['query', 'ids'], msg, node);
+      if (!queryOrId) return;
       //
       //  Deleting Documents or Items ?
       //
-      if ((config.documentsOrItems.trim() === '') && 
-          (msg.DDB_documentsOrItems || (msg.DDB_documentsOrItems.trim() === ''))) {
-            let errString = __moduleName + ": Missing documentsOrItems string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-      }
-      if (config.documentsOrItems.trim() !== '') {
-        if (config.documentsOrItems === 'fromMsg') {
-          if (!msg.DDB_documentsOrItems || (msg.DDB_documentsOrItems.trim() === '')) {
-            let errString = __moduleName + ": Missing documentsOrItems string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-          } else {
-            documentsOrItems = msg.DDB_documentsOrItems.trim();
-          }
-        } else {
-          documentsOrItems = config.documentsOrItems.trim();
-        }
-      } else {
-        documentsOrItems = msg.DDB_documentsOrItems.trim();
-      }
-      if ((documentsOrItems !== 'documents') && (documentsOrItems !== 'items')) {
-        let errString = __moduleName + ": Invalid documentsOrItems string : " + documentsOrItems;
-        console.log(errString);
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
-        return;
-      }
+      documentsOrItems = __getMandatorInputFromSelect(__moduleName, config.documentsOrItems, msg.DDB_documentsOrItems, 'documentsOrItems', ['documents', 'items'], msg, node);
+      if (!documentsOrItems) return;
       //
       //  Processing itemNames
       //
       if (documentsOrItems === 'items') {
-        if ((config.itemNames.trim() === '') && 
-            (!msg.DDB_itemNames || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
-          //
-          //  No Items names
-          //
-          let errString = __moduleName + ": No Item Names";
-          console.log(errString);
-          msg.DDB_fatal = {message: errString};
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
-          return;
-        } else {
-          //
-          //  transofrming to Array
-          //
-          if (config.itemNames.trim() !== '') {
-            itemNames = config.itemNames.trim();
-          } else {
-            itemNames = msg.DDB_itemNames.trim();
-          }
-          //
-          //  Transform comma-separated string into array
-          //
-          itemNames = itemNames.trim().split(',');
-          for (let i=0; i < itemNames.length; i++) {
-            itemNames[i] = itemNames[i].trim();
-          }
+        //
+        //  Comma-separated list of itemNames
+        //
+        itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, 'itemNames', msg, node);
+        if (!itemNames) return;
+        //
+        //  Transform comma-separated string into array
+        //
+        itemNames = itemNames.trim().split(',');
+        for (let i=0; i < itemNames.length; i++) {
+          itemNames[i] = itemNames[i].trim();
         }
       } else {
         //
@@ -167,19 +84,24 @@ module.exports = function(RED) {
         //
         //  DQL Query String
         //
-        if ((config.query.trim() === '') && 
-           ((msg.DDB_query === undefined) || (msg.DDB_query.trim() === ''))) {
-            let errString = __moduleName + ": Missing DQL query string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-        }
-        if (config.query.trim() !== '') {
-          query = config.query.trim();
-        } else {
-          query = msg.DDB_query.trim();
+        query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, 'DQL query', msg, node);
+        if (!query) return;
+        //
+        //  Check how many records to retrieve
+        //
+        displayResults = __getMandatorInputFromSelect(__moduleName, config.displayResults, msg.DDB_displayResults, 'displayResults', ['Default', 'All', 'byPage'], msg, node);
+        if (!displayResults) return;
+        if (displayResults === 'byPage') {
+          if (msg.DDB_startValue) {
+            startValue = msg.DDB_startValue;
+          } else {
+            startValue = config.startValue;
+          }
+          if (msg.DDB_countValue) {
+            countValue = msg.DDB_countValue;
+          } else {
+            countValue = config.countValue;
+          }
         }
         //
         //  Check if we need to care about the options
@@ -188,134 +110,43 @@ module.exports = function(RED) {
           //
           //  Max View Entries
           //
-          if ((config.maxViewEntries.trim() === '') && 
-            ((msg.DDB_maxViewEntries === undefined) || (msg.DDB_maxViewEntries.trim() === ''))) {
-              let warnString = __moduleName + ": maxViewEntries set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-          } else {
-            if (config.maxViewEntries !== '') {
-              maxViewEntries = config.maxViewEntries;
-            } else {
-              maxViewEntries = msg.DDB_maxViewEntries;
-            }
-            if (Number(maxViewEntries) && Number.isInteger(maxViewEntries) && (maxViewEntries > 0)) {
-              //
-              //  This is an OK value
-              //
-              if (! queryLimits) queryLimits = {};
-              queryLimits.maxViewEntriesScanned = maxViewEntries;
-            } else {
-              //
-              //  Not numeric, or not integer or negative integer
-              //
-              let warnString = __moduleName + ": maxViewEntries set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-            }
-          }
-          //
-          //  Max Documents
-          //
-          if ((config.maxDocuments.trim() === '') && 
-            ((msg.DDB_maxDocuments === undefined) || (msg.DDB_maxDocuments.trim() === ''))) {
-              let warnString = __moduleName + ": maxDocuments set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-          } else {
-            if (config.maxDocuments !== '') {
-              maxDocuments = config.maxDocuments;
-            } else {
-              maxDocuments = msg.DDB_maxDocuments;
-            }
-            if (Number(maxDocuments) && Number.isInteger(maxDocuments) && (maxDocuments > 0)) {
-              //
-              //  This is an OK value
-              //
-              if (! queryLimits) queryLimits = {};
-              queryLimits.maxDocumentsScanned = maxDocuments;
-            } else {
-              //
-              //  Not numeric, or not integer or negative integer
-              //
-              let warnString = __moduleName + ": maxDocuments set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-            }
-          }
-          //
-          //  Max Milliseconds
-          //
-          if ((config.maxMillisecs.trim() === '') && 
-            ((msg.DDB_maxMillisecs === undefined) || (msg.DDB_maxMillisecs.trim() === ''))) {
-              let warnString = __moduleName + ": maxMillisecs set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-          } else {
-            if (config.maxMillisecs !== '') {
-              maxMillisecs = config.maxMillisecs;
-            } else {
-              maxMillisecs = msg.DDB_maxMillisecs;
-            }
-            if (Number(maxMillisecs) && Number.isInteger(maxMillisecs) && (maxMillisecs > 0)) {
-              //
-              //  This is an OK value
-              //
-              if (! queryLimits) queryLimits = {};
-              queryLimits.maxMilliSeconds = maxMillisecs;
-            } else {
-              //
-              //  Not numeric, or not integer or negative integer
-              //
-              let warnString = __moduleName + ": maxMillisecs set to default";
-              console.log(warnString);
-              node.status({fill: "yellow", shape: "dot", text: warnString});
-              node.warn(warnString);
-            }
-          }
+          queryLimits = __getOptionValue(__moduleName, queryLimits, 'maxViewEntriesScanned', config.maxViewEntries, msg.DDB_maxViewEntries, node);
+          queryLimits = __getOptionValue(__moduleName, queryLimits, 'maxDocumentsScanned', config.maxDocuments, msg.DDB_maxDocuments, node);
+          queryLimits = __getOptionValue(__moduleName, queryLimits, 'maxMilliSeconds', config.maxMillisecs, msg.DDB_maxMillisecs, node);
+          __logJson(__moduleName, __isDebug, 'Using Query Limits', queryLimits);
         } else {
-          console.log(__moduleName + ": Using Default Options");
+          __log(__moduleName, __isDebug, "Using Default Options");
         }
         //
         //  Prepare the Configuration to be executed
         //
         bulkCmdConfig.query = `${query}`;
         if (queryLimits) bulkCmdConfig.queryLimits = queryLimits;
+        if (displayResults === 'byPage') {
+          bulkCmdConfig.start = startValue;
+          bulkCmdConfig.count = countValue;
+        }
+        if (displayResults === 'All') {
+          bulkCmdConfig.start = 0;
+          bulkCmdConfig.count = 200;
+        }
       } else {
         //
         //  Comma-separated list of docunids
         //
-        if ((config.unids.trim() === '') && 
-           ((msg.DDB_unids === undefined) || ((typeof msg.DDB_unids) !== 'string') || (msg.DDB_unids.trim() === ''))) {
-            let errString = __moduleName + ": Missing Docunids";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-        } else {
-          if (config.unids.trim() !== '') {
-            unids = config.unids;
-          } else {
-            unids = msg.DDB_unids;
-          }
-          //
-          //  Transform comma-separated string into array
-          //
-          unids = unids.trim().split(',');
-          for (let i=0; i < unids.length; i++) {
-            unids[i] = unids[i].trim();
-          }
+        unids = __getMandatoryInputString(__moduleName, config.unids, msg.DDB_unids, 'DocUnids', msg, node);
+        if (!unids) return;
+        //
+        //  Transform comma-separated string into array
+        //
+        unids = unids.trim().split(',');
+        for (let i=0; i < unids.length; i++) {
+          unids[i] = unids[i].trim();
         }
         //
         //  Prepare the Configuration to be executed
         //
-        if (unids) bulkCmdConfig.unids = unids;
+        bulkCmdConfig.unids = unids;
       }
       //
       //  Finish Configuration of the options for the call
@@ -325,7 +156,7 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
-      _logJson("executing with the following options: ", bulkCmdConfig);
+      __logJson(__moduleName, __isDebug, "executing with the following options: ", bulkCmdConfig);
       const serverConfig = {
         hostName: creds.D10_server, 
         connection: {
@@ -344,14 +175,7 @@ module.exports = function(RED) {
         try {
           db = await server.useDatabase(databaseConfig);
         } catch (err) {
-          let errString = __moduleName + ": Error Accessing database config";
-          console.log(errString);
-          console.log(JSON.stringify(databaseConfig, ' ', 2));
-          console.log(__moduleName + ': Error follows : ');
-          console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          __logError(__moduleName, "Error Accessing database config", databaseConfig, err, msg, node);
           return;
         }
         let docs = null;
@@ -364,6 +188,56 @@ module.exports = function(RED) {
               docs = await  db.bulkDeleteDocuments(bulkCmdConfig);
             } else {
               docs = await  db.bulkDeleteItems(bulkCmdConfig);
+            }
+            if (displayResults !== 'All') {
+              //
+              //  We are doing a 'Default' (where we do not specify start and count) or 
+              //  we are doing 'byPage' (and in this case we previously added start and count to the 
+              //  buldCmdConfig object)
+              //  So the call we just did is enough for bringing all the results
+              //
+            } else {
+              //
+              //  In this case we will have to iterate over all the results!!
+              //  Since we do not know how many results the DQL query will bring back,
+              //  we need to perform an initial call to get the information retrieved 
+              //  by the query about the total number of documents
+              //  These information are contained in 'documentRange' attribute of the 
+              //  result from the first call. 
+              //  More precisely, 'documentRange' provides information about the 
+              //  current 'start' and 'count', but also the 'total' 
+              //
+              let documentRange = docs.documentRange;
+              if (documentRange) {
+                if ((documentRange.start + documentRange.count) < documentRange.total) {
+                  //
+                  //  We need to get more information :-)
+                  //
+                  let newStart = documentRange.count;
+                  while (newStart < documentRange.total) {
+                    bulkCmdConfig.start = newStart;
+                    node.status({fill: "blue", shape: "dot", text: "Processing from " + newStart});
+                    let tmpDocs;
+                    if (documentsOrItems === 'documents') {
+                      tmpDocs = await  db.bulkDeleteDocuments(bulkCmdConfig);
+                    } else {
+                      tmpDocs = await  db.bulkDeleteItems(bulkCmdConfig);
+                    }
+                    docs.documents = docs.documents.concat(tmpDocs.documents);
+                    newStart = newStart + tmpDocs.documentRange.count;
+                  }
+                } else {
+                  //
+                  //  Nothing to do. We retrieved all the documents with the first query
+                  //
+                }
+              } else {
+                //
+                //  Houston, we have a problem. 
+                //
+                __logError(__moduleName, "Error Getting documentRange Information", documentRange, null, msg, node);
+                return;
+              }
             }
           } else {
             //
@@ -383,30 +257,18 @@ module.exports = function(RED) {
           if ((msg.DDB_result) && (msg.DDB_result.documents)) delete(msg.DDB_result.documents);
           node.status({fill:"green", shape:"dot", text:"OK"});
           node.send(msg);
-          _log("succesfully exiting ");
+          __log(__moduleName, __isDebug, "succesfully exiting ");
           //
           //  Reset visual status on success
           //
           setTimeout(() => {node.status({});}, 2000);
         } catch(err) {
-          let errString = __moduleName + ": Error Getting Results";
-          console.log(errString);
-          console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          __logError(__moduleName, "Error Getting Results", null, err, msg, node);
           return;
         }
       })
       .catch(err => {
-        let errString = __moduleName + ': Error accessing Server with the following configuration';
-        console.log(errString);
-        console.log(JSON.stringify(serverConfig, ' ', 2));
-        console.log(__moduleName + ': Error follows : ');
-        console.log(JSON.stringify(err, ' ', 2));
-        msg.DDB_fatal = err;
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        __logError(__moduleName, "Error accessing Server with the following configuration", serverConfig, err, msg, node);
         return;
      });
     });
@@ -427,24 +289,4 @@ module.exports = function(RED) {
   //  Node Registration
   //
   RED.nodes.registerType("D10_deleteDocuments", D10_deleteDocuments);
-  
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function
-    //
-  function _log(logMsg){
-    if (__isDebug) {
-        console.log(__moduleName + " => " + logMsg);
-    };
-  };
-  //
-  //  Common logging function with JSON Objects
-  //
-  function _logJson(logMsg, jsonObj) {
-      if (__isDebug) {
-        console.log(__moduleName + " => " + (logMsg ? logMsg : ""));
-        console.log(JSON.stringify(jsonObj, " ", 2));
-    };
-  };
 };

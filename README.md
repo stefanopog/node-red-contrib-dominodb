@@ -13,6 +13,15 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
 
 # **Changes**
+### V 0.9.5 Introducing *count* and *start*
+* The **GetDocuments**, **Replace Documents/items** and **Delete Documents/Items** node now support the `start`and `count` configuration options. 
+  * These options **only apply** to operations that are based on **DQL Queries**.
+  * Whenever a **DQL Query** is involved, the user can select which results the node should return:
+    * `Default` : the query will be executed without any *start* and *count* information (default to 100 items being read, replaced or deleted)
+    * `All` : the query will return all results. In this case the **Get Documents** node will retrun all the results, the **Replace Documents/items** node will update all the documents matching the query and the **Delete Documents/Items** node will delete all the documents matching the query or the items for all the documents matching the query. 
+    * `byPage` : the query will return `count`results starting at index `start`
+* At the same time, some code refactoring has been applied
+
 ### V 0.9.4 Fixes
 * Fixing problem with **deprecated nodes** : in previous version they were identical to the non-deprecated version. Now restored them to V0.1.0
 * Fixing problem with this README file. 

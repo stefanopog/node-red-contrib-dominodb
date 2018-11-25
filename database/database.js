@@ -3,17 +3,9 @@ Copyright IBM All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
+
 module.exports = function(RED) {
     "use strict";
-    /*
-    const OAuth2 = require('simple-oauth2');
-    const urllib = require("url");
-    const http = require("follow-redirects").http;
-    const https = require("follow-redirects").https;
-    const getRawBody = require('raw-body');
-    const crypto = require('crypto');
-    const rp = require("request-promise-native");
-    */
     var __isDebug = process.env.d10Debug || false;
     var __moduleName = 'D10_dominoDB';
 
@@ -25,16 +17,16 @@ module.exports = function(RED) {
 
     function D10_dominoDB(config) {
         RED.nodes.createNode(this, config);
+        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatorInputFromSelect, __getOptionalInputString } = require('../common/common.js');
 
         this.name = config.displayName;
         this.displayName = config.displayName;
         this.D10_server = config.D10_server;
         this.D10_db = config.D10_db;
         this.D10_port = config.D10_port;
-        _log("###############################################");
-        _log("Credentials for [" + this.id + "] " + (this.name ? this.name : ""));
-        _logJson("", this.credentials);
-        _log("###############################################");
+        _log(__moduleName, true, "###############################################");
+        _logJson(__moduleName, true, "Credentials for [" + this.id + "] " + (this.name ? this.name : ""), this.credentials);
+        _log(__moduleName, true, "###############################################");
         
         this.on('close', function(removed, done) {
             if (removed) {
@@ -54,24 +46,6 @@ module.exports = function(RED) {
             return RED.nodes.getCredentials(this.id);
         };
     };
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function
-    //
-    function _log(logMsg){
-        if (__isDebug) {
-            console.log(__moduleName + " => " + logMsg);
-        };
-    };
-    //
-    //  Common logging function with JSON Objects
-    //
-    function _logJson(logMsg, jsonObj) {
-        if (__isDebug) {
-            console.log(__moduleName + " => " + (logMsg ? logMsg : "") + JSON.stringify(jsonObj, " ", 2));
-        };
-    };
     
     //
     //  Implementing Basic Authentication
@@ -88,7 +62,7 @@ module.exports = function(RED) {
             D10_port: req.query.D10_port,
             displayName: req.query.displayName
         };
-        _logJson("*** NEW CREDENTIALS ****", credentials);
+        _logJson(__moduleName, true, "*** NEW CREDENTIALS ****", credentials);
         RED.nodes.addCredentials(node_id, credentials);
         res.send(200);
     });
