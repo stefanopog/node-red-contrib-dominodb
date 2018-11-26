@@ -75,7 +75,7 @@ function __getOptionValue(moduleName, theLimits, theOption, fromConfig, fromMsg,
     return theLimits;
 }
 
-function __getMandatorInputFromSelect(moduleName, fromConfig, fromMsg, label, values, theMsg, theNode) {
+function __getMandatoryInputFromSelect(moduleName, fromConfig, fromMsg, label, values, theMsg, theNode) {
     var theValue = null;
     if ((fromConfig.trim() === '') && (!fromMsg || (fromMsg.trim() === ''))) {
         __logError(moduleName, "Missing " + label + " string", null, null, theMsg, theNode);
@@ -130,4 +130,4 @@ function __getOptionalInputString(moduleName, fromConfig, fromMsg, label, theMsg
     return theValue;
 }
 
-module.exports = {__log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatorInputFromSelect, __getMandatoryInputString, __getOptionalInputString};
+module.exports = {__log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString};

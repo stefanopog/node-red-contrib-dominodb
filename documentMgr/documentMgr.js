@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 */
 module.exports = function(RED) {
   var __isDebug = process.env.d10Debug || false;
-  var __moduleName = 'D10_getDocuments';
+  var __moduleName = 'D10_documentMgr';
 
 
   console.log("*****************************************");
@@ -16,6 +16,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
+    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -33,75 +34,30 @@ module.exports = function(RED) {
       let itemValues = [];
       let options = {};
       let options2 = {};
-      //
+      const arrayToObject = (array, keyField) =>
+      array.reduce((obj, item) => {
+        obj[item[keyField]] = item.value;
+        return obj;
+      }, {});
+//
       //  Check for token on start up
       //
       if (!node.application) {
-        let errString = __moduleName + ": Please configure your Domino DB first!";
-        msg.DDB_fatal = {message: errString};
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        __logError(__moduleName, "Please configure your Domino DB first!", null, null, msg, node);
         return;
       }
       let creds = node.application.getCredentials();
       //
       //  Which Operation ?
       //
-      if ((config.documentOp.trim() === '') && 
-          (!msg.DDB_documentOp || (msg.DDB_documentOp.trim() === ''))) {
-            let errString = __moduleName + ": Missing DocumentOp string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-      }
-      if (config.documentOp.trim() !== '') {
-        if (config.documentOp === 'fromMsg') {
-          if (!msg.DDB_documentOp || (msg.DDB_documentOp.trim() === '')) {
-            let errString = __moduleName + ": Missing DocumentOp string";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
-            return;
-          } else {
-            documentOp = msg.DDB_documentOp.trim().toLowerCase();
-            const operations = ['read', 'create', 'replace', 'delete', 'replaceItems', 'deleteItems'];
-            if (operations.indexOf(documentOp) < 0) {
-              let errString = __moduleName + ": Invalid DocumentOp string : " + documentOp;
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
-              return;
-            }
-          }
-        } else {
-          documentOp = config.documentOp.trim();
-        }
-      } else {
-        documentOp = msg.DDB_documentOp.trim();
-      }
+      documentOp = __getMandatoryInputFromSelect(__moduleName, config.documentOp, msg.DDB_documentOp, 'DocumentOp', ['read', 'create', 'replace', 'delete', 'replaceItems', 'deleteItems'], msg, node);
+      if (!documentOp) return;
       //
       //  Document Id
       //
       if (documentOp !== 'create') {
-        if ((config.unid.trim() === '') && 
-            (!msg.DDB_unid || ((typeof msg.DDB_unid) !== 'string') || (msg.DDB_unid.trim() === ''))) {
-              let errString = __moduleName + ": No Document Id";
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
-              return;
-        } else {
-          if (config.unid.trim() !== '') {
-            unid = config.unid.trim();
-          } else {
-            unid = msg.DDB_unid.trim();
-          }
-        }
+        unid = __getMandatoryInputString(__moduleName, config.unid, msg.DDB_unid, 'Document Id', msg, node);
+        if (!unid) return;
       } else {
         unid = '';
       }
@@ -111,51 +67,25 @@ module.exports = function(RED) {
       switch (documentOp) {
         case 'read':
         case 'deleteItems':
-          if ((config.itemNames.trim() === '') && 
-              (!msg.DDB_itemNames || ((typeof msg.DDB_itemNames) !== 'string') || (msg.DDB_itemNames.trim() === ''))) {
-              //
-              //  No Items names
-              //
-              let errString = __moduleName + ": No Item Names";
-              console.log(errString);
-              msg.DDB_fatal = {message: errString};
-              node.status({fill: "red", shape: "dot", text: errString});
-              node.error(errString, msg);
-              return;
-          } else {
-            if (config.itemNames.trim() !== '') {
-              itemNames = config.itemNames.trim();
-            } else {
-              itemNames = msg.DDB_itemNames.trim();
-            }
-            //
-            //  Transform comma-separated string into array
-            //
-            itemNames = itemNames.trim().split(',');
-            for (let i=0; i < itemNames.length; i++) {
-              itemNames[i] = itemNames[i].trim();
-            }
+          itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, 'itemNames', msg, node);
+          if (!itemNames) return;
+          //
+          //  Transform comma-separated string into array
+          //
+          itemNames = itemNames.trim().split(',');
+          for (let i=0; i < itemNames.length; i++) {
+            itemNames[i] = itemNames[i].trim();
           }
           break;
-      }
-      //
-      //  Get the Item Values
-      //
-      switch (documentOp) {
         case 'create':
         case 'replace':
         case 'replaceItems':
           let _itemValues = [];
-          if ((config.itemValues.trim() === '') && 
-              (!msg.DDB_itemValues || !Array.isArray(msg.DDB_itemValues))) {
+          if ((config.itemValues.trim() === '') && (!msg.DDB_itemValues || !Array.isArray(msg.DDB_itemValues))) {
+            __logError(__moduleName, "No Item Values", null, null, msg, node);
             //
             //  No Items to be modified! 
             //
-            let errString = __moduleName + ": No Item Values";
-            console.log(errString);
-            msg.DDB_fatal = {message: errString};
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
             return;
           } else {
             if (config.itemValues.trim() !== '') {
@@ -193,11 +123,6 @@ module.exports = function(RED) {
           //
           //  Now transform the array into an object
           //
-          const arrayToObject = (array, keyField) =>
-              array.reduce((obj, item) => {
-                obj[item[keyField]] = item.value;
-                return obj;
-              }, {});
           itemValues = arrayToObject(_itemValues, "name");
           //
           //  And calculate the itemNames into its array
@@ -230,7 +155,7 @@ module.exports = function(RED) {
           options = {itemNames : itemNames};
           break;
       }
-      _logJson(__moduleName + ": executing operation " + documentOp + " with the following options: ", options);
+      __logJson(__moduleName, __isDebug, "executing operation " + documentOp + " with the following options: ", options);
       
       const serverConfig = {
         hostName: creds.D10_server, 
@@ -250,14 +175,7 @@ module.exports = function(RED) {
         try {
           db = await server.useDatabase(databaseConfig);
         } catch (err) {
-          let errString = __moduleName + ": Error Accessing database config";
-          console.log(errString);
-          console.log(JSON.stringify(databaseConfig, ' ', 2));
-          console.log(__moduleName + ': Error follows : ');
-          console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          __logError(__moduleName, "Error Accessing database config", databaseConfig, err, msg, node);
           return;
         }
         //
@@ -268,12 +186,7 @@ module.exports = function(RED) {
           try {
             useDocument = await db.useDocument({unid: unid});
           } catch (err) {
-            let errString = __moduleName + ': Error using document with unique id ' + unid;
-            console.log(errString);
-            console.log(JSON.stringify(err, ' ', 2));
-            msg.DDB_fatal = err;
-            node.status({fill: "red", shape: "dot", text: errString});
-            node.error(errString, msg);
+            __logError(__moduleName, "Error using document with unique id " + unid, null, err, msg, node);
             return;
           }
         }
@@ -289,7 +202,7 @@ module.exports = function(RED) {
               //  Read a Document from useDocument
               //
               myDocument = await useDocument.read(options);
-              _logJson('read document:', myDocument);
+              __logJson(__moduleName, __isDebug, 'read document:', myDocument);
               break;
             case 'create':
               //
@@ -298,48 +211,39 @@ module.exports = function(RED) {
               unid = await db.createDocument(options);
               useDocument = await db.useDocument({unid: unid});
               myDocument = await useDocument.read(options2);
-              _logJson('created document:', myDocument);
+              __logJson(__moduleName, __isDebug, 'created document:', myDocument);
             case 'replace':
               //
               //  Replace a Document and return It
               //
               await useDocument.replace(options);
               myDocument = await useDocument.read(options2);
-              _logJson('replaced document:', myDocument);
+              __logJson(__moduleName, __isDebug, 'replaced document:', myDocument);
               break;
             case 'delete':
               await useDocument.delete();
               try {
                 myDocument = await useDocument.read({});
-                let errString = __moduleName + ': Error Deleting document with uniqueId = ' + unid;
-                console.log(errString);
-                msg.DDB_fatal = {message: errString};
-                node.status({fill:"red", shape:"dot", text:errString});
-                node.error(errString, msg);
+                __logError(__moduleName, "Error Deleting document with uniqueId = " + unid, null, null, msg, node);
                 return;
               } catch (e) {
-                _log('document with uniqueId ' + unid + ' has been deleted !');
+                __log(__moduleName, __isDebug, 'document with uniqueId ' + unid + ' has been deleted !');
                 myDocument = {};
               }
               break;
             case 'replaceItems':
               await useDocument.replaceItems(options);
               myDocument = await useDocument.read(options2);
-              _logJson('replaced Items in document:', myDocument);
+              __logJson(__moduleName, __isDebug, 'replaced Items in document:', myDocument);
               break;
             case 'deleteItems':
               await useDocument.deleteItems(options);
               myDocument = await useDocument.read(options2);
-              _logJson('deleted Items in document:', myDocument);
+              __logJson(__moduleName, __isDebug, 'deleted Items in document:', myDocument);
               break;
           }
         } catch (err) {
-          let errString = __moduleName + ': Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid;
-          console.log(errString);
-          console.log(JSON.stringify(err, ' ', 2));
-          msg.DDB_fatal = err;
-          node.status({fill: "red", shape: "dot", text: errString});
-          node.error(errString, msg);
+          __logError(__moduleName, 'Error performing ' + documentOp +  ' on document qualified by the unique Id : ' + unid, null, err, msg, node);
           return;
         }
         //
@@ -355,14 +259,7 @@ module.exports = function(RED) {
         setTimeout(() => {node.status({});}, 2000);
       })
       .catch(err => {
-        let errString = __moduleName + ': Error accessing Server with the following configuration';
-        console.log(errString);
-        console.log(JSON.stringify(serverConfig, ' ', 2));
-        console.log(__moduleName + ': Error follows : ');
-        console.log(JSON.stringify(err, ' ', 2));
-        msg.DDB_fatal = err;
-        node.status({fill: "red", shape: "dot", text: errString});
-        node.error(errString, msg);
+        __logError(__moduleName, "Error accessing Server with the following configuration", serverConfig, err, msg, node);
         return;
       });
     });
@@ -383,23 +280,4 @@ module.exports = function(RED) {
   //  Node Registration
   //
   RED.nodes.registerType("D10_documentMgr", D10_documentMgr);
-    //
-    //  Internal Helper Functions
-    //
-    //  Common logging function
-    //
-    function _log(logMsg){
-      if (__isDebug) {
-          console.log(__moduleName + " => " + logMsg);
-      };
-  };
-  //
-  //  Common logging function with JSON Objects
-  //
-  function _logJson(logMsg, jsonObj) {
-      if (__isDebug) {
-        console.log(__moduleName + " => " + (logMsg ? logMsg : ""));
-        console.log(JSON.stringify(jsonObj, " ", 2));
-    };
-  };
 };

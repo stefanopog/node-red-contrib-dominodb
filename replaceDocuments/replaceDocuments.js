@@ -17,7 +17,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatorInputFromSelect, __getOptionalInputString } = require('../common/common.js');
+    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -55,12 +55,12 @@ module.exports = function(RED) {
       //
       //  Query or Docunids ?
       //
-      queryOrId = __getMandatorInputFromSelect(__moduleName, config.queryOrId, msg.DDB_queryOrId, 'queryOrId', ['query', 'ids'], msg, node);
+      queryOrId = __getMandatoryInputFromSelect(__moduleName, config.queryOrId, msg.DDB_queryOrId, 'queryOrId', ['query', 'ids'], msg, node);
       if (!queryOrId) return;
       //
       //  Deleting Documents or Items ?
       //
-      documentsOrItems = __getMandatorInputFromSelect(__moduleName, config.documentsOrItems, msg.DDB_documentsOrItems, 'documentsOrItems', ['documents', 'items'], msg, node);
+      documentsOrItems = __getMandatoryInputFromSelect(__moduleName, config.documentsOrItems, msg.DDB_documentsOrItems, 'documentsOrItems', ['documents', 'items'], msg, node);
       if (!documentsOrItems) return;
       //
       //  Process itemValuesById
@@ -159,7 +159,7 @@ module.exports = function(RED) {
         //
         //  Check how many records to retrieve
         //
-        displayResults = __getMandatorInputFromSelect(__moduleName, config.displayResults, msg.DDB_displayResults, 'displayResults', ['Default', 'All', 'byPage'], msg, node);
+        displayResults = __getMandatoryInputFromSelect(__moduleName, config.displayResults, msg.DDB_displayResults, 'displayResults', ['Default', 'All', 'byPage'], msg, node);
         if (!displayResults) return;
         if (displayResults === 'byPage') {
           if (msg.DDB_startValue) {

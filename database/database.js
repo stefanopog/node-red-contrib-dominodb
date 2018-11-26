@@ -17,16 +17,16 @@ module.exports = function(RED) {
 
     function D10_dominoDB(config) {
         RED.nodes.createNode(this, config);
-        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatorInputFromSelect, __getOptionalInputString } = require('../common/common.js');
+        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
 
         this.name = config.displayName;
         this.displayName = config.displayName;
         this.D10_server = config.D10_server;
         this.D10_db = config.D10_db;
         this.D10_port = config.D10_port;
-        _log(__moduleName, true, "###############################################");
-        _logJson(__moduleName, true, "Credentials for [" + this.id + "] " + (this.name ? this.name : ""), this.credentials);
-        _log(__moduleName, true, "###############################################");
+        __log(__moduleName, true, "###############################################");
+        __logJson(__moduleName, true, "Credentials for [" + this.id + "] " + (this.name ? this.name : ""), this.credentials);
+        __log(__moduleName, true, "###############################################");
         
         this.on('close', function(removed, done) {
             if (removed) {
@@ -62,7 +62,7 @@ module.exports = function(RED) {
             D10_port: req.query.D10_port,
             displayName: req.query.displayName
         };
-        _logJson(__moduleName, true, "*** NEW CREDENTIALS ****", credentials);
+        __logJson(__moduleName, true, "*** NEW CREDENTIALS ****", credentials);
         RED.nodes.addCredentials(node_id, credentials);
         res.send(200);
     });
