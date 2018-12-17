@@ -50,7 +50,7 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
-      _logJson(__moduleName, __isDebug, "executing with the following options: ", explainConfig);
+      __logJson(__moduleName, __isDebug, "executing with the following options: ", explainConfig);
       const serverConfig = {
         hostName: creds.D10_server, 
         connection: {
