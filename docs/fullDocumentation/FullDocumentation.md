@@ -7,32 +7,29 @@ title: |
 Table Of Contents
 =================
 
-[Table Of Contents 1](#table-of-contents)
+[A new set of APIs](#a-new-set-of-apis)
 
-[A new set of APIs 1](#a-new-set-of-apis)
+[Introducing Node-RED](#introducing-node-red)
 
-[Introducing Node-RED 3](#introducing-node-red)
+[The Domino 10 Node-RED nodes](#the-domino-10-node-red-nodes)
 
-[The Domino 10 Node-RED nodes 3](#the-domino-10-node-red-nodes)
+[The Configuration Node (dominodb)](#the-configuration-node-dominodb)
 
-[The Configuration Node (dominodb) 5](#the-configuration-node-dominodb)
+[Details of the dominodb Node-RED package](#details-of-the-dominodb-node-red-package)
 
-[Details of the dominodb Node-RED package
-7](#details-of-the-dominodb-node-red-package)
+[GetDocuments node](#getdocuments-node)
 
-[GetDocuments node 7](#getdocuments-node)
+[Replace Documents / Items node](#replace-documents-items-node)
 
-[Replace Documents / Items node 13](#replace-documents-items-node)
+[Delete Documents / Items node](#delete-documents-items-node)
 
-[Delete Documents / Items node 22](#delete-documents-items-node)
+[Create Documents node](#create-documents-node)
 
-[Create Documents node 33](#create-documents-node)
+[DocumentMgr node](#documentmgr-node)
 
-[DocumentMgr node 36](#documentmgr-node)
+[Explain Query node](#explain-query-node)
 
-[Explain Query node 44](#explain-query-node)
-
-[Error Handling 46](#error-handling)
+[Error Handling](#error-handling)
 
 A new set of APIs
 =================
@@ -107,7 +104,7 @@ data that need to be manipulated. Here is an example of the code
 fragment that is required to create a single document using the new
 APIs.
 
-![](./media/image1.png){width="5.699301181102363in" height="4.502833552055993in"}
+![](./media/image1.png = "5.699301181102363in" x "4.502833552055993in"}
 
 Introducing Node-RED
 ====================
