@@ -1,34 +1,22 @@
 ---
 title: |
-    Simplify the use and the access of the Domino 10 AppDev Pack using
-    NodeRED
+    Simplify the use and the access of the Domino 10 AppDev Pack using NodeRED
 ---
 
 Table Of Contents
 =================
 
 [A new set of APIs](#a-new-set-of-apis)
-
 [Introducing Node-RED](#introducing-node-red)
-
 [The Domino 10 Node-RED nodes](#the-domino-10-node-red-nodes)
-
 [The Configuration Node (dominodb)](#the-configuration-node-dominodb)
-
 [Details of the dominodb Node-RED package](#details-of-the-dominodb-node-red-package)
-
 [GetDocuments node](#getdocuments-node)
-
 [Replace Documents / Items node](#replace-documents-items-node)
-
 [Delete Documents / Items node](#delete-documents-items-node)
-
 [Create Documents node](#create-documents-node)
-
 [DocumentMgr node](#documentmgr-node)
-
 [Explain Query node](#explain-query-node)
-
 [Error Handling](#error-handling)
 
 A new set of APIs
@@ -104,7 +92,7 @@ data that need to be manipulated. Here is an example of the code
 fragment that is required to create a single document using the new
 APIs.
 
-![](./media/image1.png = "5.699301181102363in" x "4.502833552055993in"}
+![](./media/image1.png)
 
 Introducing Node-RED
 ====================
@@ -123,7 +111,7 @@ The **node-red-contrib-dominodb** Node-RED package
 (https://flows.nodered.org/node/node-red-contrib-dominodb) provides the
 following nodes:
 
-![](./media/image2.png){width="6.041666666666667in" height="2.6666666666666665in"}
+![](./media/image2.png)
 
 Each node, by selecting an instance of the **dominodb node** (see
 [here](#the-configuration-node-dominodb)), implements all the code (and
@@ -141,7 +129,7 @@ The list of available nodes is shown under the **Domino 10 Category** on
 the left palette of the Node-RED\
 editor, as shown here:
 
-![](./media/image3.png){width="6.5in" height="3.902083333333333in"}
+![](./media/image3.png)
 
 **[Note]{.underline}:**
 
@@ -163,8 +151,7 @@ d10Debug environment variable to true.
 ### The Configuration Node (dominodb)
 
 A special role is reserved to the **dominodb node**:
-![](./media/image4.png){width="0.9027777777777778in"
-height="0.2222222222222222in"}\
+![](./media/image4.png)\
 This node (a *Configuration node*, in Node-RED parlance) defines a
 configuration for the Domino Server and Domino Database that will be
 used by all the other nodes.
@@ -183,8 +170,7 @@ package](#details-of-the-dominodb-node-red-package)" section), allow you
 to select the **dominodb node** that will be used via the *Database
 dropdown* selector:
 
-![](./media/image5.png){width="3.6527777777777777in"
-height="2.4444444444444446in"}
+![](./media/image5.png)
 
 When you need to create a configuration for a new Domino Database on a
 given server, you select, from the dropdown, the Add new dominodb...
@@ -192,8 +178,7 @@ option and you click on the pencil icon on its right.
 
 This opens the editor for configuring a new connection:
 
-![](./media/image6.png){width="3.5416666666666665in"
-height="2.638888888888889in"}
+![](./media/image6.png)
 
 You need to provide the details for your server (1), the port (2) and
 the location of the Domino Database you want to use (3).
@@ -208,14 +193,13 @@ As mentioned above, you can have multiple **dominodb configuration
 nodes** and they will all be available via the *Database dropdown
 selector* for all other nodes in the package.
 
-![](./media/image7.png){width="6.5in" height="4.377083333333333in"}
+![](./media/image7.png)
 
 You can modify any previously created **dominodb configuration node** by
 selecting it in the *Database dropdown selector* and clicking on the
 pencil icon:
 
-![](./media/image8.png){width="3.5555555555555554in"
-height="1.7222222222222223in"}
+![](./media/image8.png)
 
 Details of the dominodb Node-RED package
 ========================================
@@ -235,7 +219,7 @@ Panel or via the msg.DDB\_queryOrId input parameter.
 
 Clicking on the instance of the node, you can see the online help in the
 rightmost panel of the Node-RED editor:\
-![](./media/image9.png){width="6.5in" height="4.0in"}
+![](./media/image9.png)
 
 The help describes the behavior of the node as well as all the input and
 output parameters for the node itself.
@@ -243,14 +227,14 @@ output parameters for the node itself.
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image10.png){width="6.5in" height="3.1215277777777777in"}\
+![](./media/image10.png)\
 This provides access to the library of **dominodb configurations**.
 
 Selecting the operation\
 By means of the *Type selector*, you can choose to retrieve the
 documents identified by a **DQL Query** or by specifying the list of
 Unique Ids associated to each document.\
-![](./media/image11.png){width="6.5in" height="3.060416666666667in"}\
+![](./media/image11.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_queryOrIds attribute the kind of operation to be performed.
@@ -266,7 +250,7 @@ When selecting the **By Query option**, you can specify a valid **DQL
 Query** (in the following picture 'nodejs'.status = 'pending' ) and the
 list of items (in the following picture status, customer, description as
 comma-separated items) to be retrieved.\
-![](./media/image12.png){width="6.5in" height="3.2805555555555554in"}
+![](./media/image12.png)
 
 -   The *DQL Query input* can be left empty in the editor. You can use
     the msg.DDB\_query input attribute to provide the information at
@@ -275,8 +259,7 @@ comma-separated items) to be retrieved.\
 -   The *Results selector* allows to define the documents that will be
     returned.\
     The possible values are:\
-    ![](./media/image13.png){width="6.5in"
-    height="3.0861111111111112in"}
+    ![](./media/image13.png)
 
     -   ***Default***:\
         In this case the query will be executed without specifying any
@@ -308,8 +291,7 @@ comma-separated items) to be retrieved.\
     You can override them by unchecking the *Default Options checkbox*
     and specifying different values for the Max View Entries, Max
     Documents and Max Milliseconds parameters).\
-    ![](./media/image14.png){width="3.0827066929133857in"
-    height="2.0327996500437444in"}
+    ![](./media/image14.png)
 
 -   The *Item Names input* can be left empty in the editor. You can use
     the msg.DDB\_itemNames input attribute (which is, also, a
@@ -321,7 +303,7 @@ When selecting the **By UniqueIds option**, you can specify the list of
 Unique Ids (as comma-separated list of items) representing the documents
 to be retrieved and the list of items (in the following picture status,
 description, customer as comma-separated items) to be retrieved.\
-![](./media/image15.png){width="6.5in" height="2.477777777777778in"}
+![](./media/image15.png)
 
 -   The *Doc Ids input* can be left empty in the editor. You can use the
     msg.DDB\_unids input attribute (which is, also, a comma-separated
@@ -335,20 +317,17 @@ description, customer as comma-separated items) to be retrieved.\
 ##### Controlling the behavior and appearance of your instance
 
 -   You can specify the behavior of the API in case of error\
-    ![](./media/image16.png){width="3.872179571303587in"
-    height="0.8216830708661418in"}
+    ![](./media/image16.png)
 
 -   Do not forget to give a meaningful name to your newly created node\
-    ![](./media/image17.png){width="3.240601487314086in"
-    height="0.912169728783902in"}
+    ![](./media/image17.png)
 
 ##### Output
 
 If the execution of the node successfully completes, the following
 outputs will be provided:
 
-![](./media/image18.png){width="3.888888888888889in"
-height="4.444444444444445in"}
+![](./media/image18.png)
 
 The DDB\_docs array provides a list of Objects which include the values
 of the items you specified for your request.
@@ -356,8 +335,7 @@ of the items you specified for your request.
 The DDB\_result object contains the additional outputs provided by the
 API, including the total number of documents matching the query, the
 start index and the count value.\
-![](./media/image19.png){width="2.4027777777777777in"
-height="2.2916666666666665in"}
+![](./media/image19.png)
 
 ### Replace Documents / Items node
 
@@ -380,18 +358,18 @@ height="2.2916666666666665in"}
 
 Clicking on the instance of the node, you can see the online help in the
 rightmost panel of the Node-RED editor:\
-![](./media/image20.png){width="6.5in" height="3.9472222222222224in"}
+![](./media/image20.png)
 
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image21.png){width="6.5in" height="4.447222222222222in"}\
+![](./media/image21.png)\
 This provides access to the library of **dominodb configurations**.
 
 Selecting the target\
 By means of the Docs or Items selector, you can choose to replace entire
 documents or the value of certain items within the selected documents.\
-![](./media/image22.png){width="6.5in" height="3.897222222222222in"}\
+![](./media/image22.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_documentsOrItems attribute the kind of operation to be
@@ -407,7 +385,7 @@ Selecting the operation\
 By means of the *Type selector*, you can choose to replace the documents
 identified by a **DQL Query** or by the list of Unique Ids associated to
 each document.\
-![](./media/image23.png){width="6.5in" height="3.4875in"}\
+![](./media/image23.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_queryOrIds attribute the kind of operation to be performed.
@@ -431,8 +409,7 @@ not currently supported by the APIs.
 If you elected to replace entire documents, you will see the following
 panel:
 
-![](./media/image24.png){width="5.680555555555555in"
-height="3.0972222222222223in"}
+![](./media/image24.png)
 
 Apparently, you cannot specify which Documents you actually want to
 replace. This is normal.\
@@ -448,14 +425,14 @@ used.
 Here below is a simple example of how this attribute can be built by a
 **Function Node** and passed to **the Replace Doc/Items node**.
 
-![](./media/image25.png){width="6.5in" height="2.720138888888889in"}
+![](./media/image25.png)
 
 ##### Replacing Items by Query
 
 If you want to replace items within documents by specifying a **DQL
 Query**, you will see the following panel:
 
-![](./media/image26.png){width="6.5in" height="3.6326388888888888in"}
+![](./media/image26.png)
 
 You can specify a valid **DQL Query** (in the above picture
 'nodejs'.status = 'pending' ) and a comma-separated list of
@@ -471,8 +448,7 @@ DQL query.
 -   The *Results selector* allows to define the documents that will be
     replaced.\
     The possible values are:\
-    ![](./media/image13.png){width="6.5in"
-    height="3.0861111111111112in"}
+    ![](./media/image13.png)
 
     -   ***Default***:\
         In this case the query will be executed without specifying any
@@ -505,22 +481,19 @@ DQL query.
     You can override them by unchecking the *Default Options checkbox*
     and specifying different values for the Max View Entries, Max
     Documents and Max Milliseconds parameters).\
-    ![](./media/image14.png){width="3.0827066929133857in"
-    height="2.0327996500437444in"}
+    ![](./media/image14.png)
 
 -   The *Item Values input* can be left empty in the editor. You can use
     the msg.DDB\_itemValues input attribute (which is an array of JSON
     objects formatted in the following way:\
-    ![](./media/image27.png){width="3.6805555555555554in"
-    height="1.0833333333333333in"}
+    ![](./media/image27.png)
 
 ##### Replacing Items by Unique Ids
 
 If you want to replace items within documents by specifying a list of
 **unique Ids**, you will see the following panel:
 
-![](./media/image28.png){width="5.805555555555555in"
-height="2.9722222222222223in"}
+![](./media/image28.png)
 
 You can specify a comma-separated list of **itemName=itemValue** pairs
 (in the above picture customer=MICKEY, amount=123).\
@@ -530,8 +503,7 @@ apply to all the selected documents.
 -   The *Item Values input* can be left empty in the editor. You can use
     the msg.DDB\_itemValues input attribute (which is an array of JSON
     objects formatted in the following way:\
-    ![](./media/image27.png){width="3.6805555555555554in"
-    height="1.0833333333333333in"}
+    ![](./media/image27.png)
 
 In order to provide the list of unique ids for replacing the items, we
 need to go back to the API used in this situation, which is the
@@ -546,27 +518,24 @@ used.
 Here below is a simple example of how this attribute can be built by a
 **Function Node** and passed to **the Replace Doc/Items node**.
 
-![](./media/image25.png){width="6.5in" height="2.720138888888889in"}
+![](./media/image25.png)
 
 ##### 
 
 ##### Controlling the behavior and appearance of your instance
 
 -   You can specify the behavior of the API in case of error\
-    ![](./media/image16.png){width="4.4644750656167975in"
-    height="0.9473687664041994in"}
+    ![](./media/image16.png)
 
 -   Do not forget to give a meaningful name to your newly created node\
-    ![](./media/image17.png){width="3.5259208223972003in"
-    height="0.9924814085739283in"}
+    ![](./media/image17.png)
 
 ##### Output
 
 If the execution of the node successfully completes, the following
 outputs will be provided:
 
-![](./media/image29.png){width="3.7777777777777777in"
-height="2.736111111111111in"}
+![](./media/image29.png)
 
 The DDB\_docs array provides a list of Unique Ids representing the
 documents that have been deleted or the items of which have been
@@ -575,8 +544,7 @@ deleted.
 The DDB\_result object contains the additional outputs provided by the
 API, including the total number of documents matching the query, the
 start index and the count value.\
-![](./media/image19.png){width="2.4027777777777777in"
-height="2.2916666666666665in"}
+![](./media/image19.png)
 
 ### Delete Documents / Items node
 
@@ -602,18 +570,18 @@ The node implements the following APIs
 
 Clicking on the instance of the node, you can see the online help in the
 rightmost panel of the Node-RED editor:\
-![](./media/image30.png){width="6.5in" height="3.79375in"}
+![](./media/image30.png)
 
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image31.png){width="6.5in" height="3.9625in"}\
+![](./media/image31.png)\
 This provides access to the library of **dominodb configurations**.
 
 Selecting the target\
 By means of the Docs or Items selector, you can choose to delete entire
 documents or the value of certain items within the selected documents.\
-![](./media/image32.png){width="6.5in" height="3.727777777777778in"}\
+![](./media/image32.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_documentsOrItems attribute the kind of operation to be
@@ -625,7 +593,7 @@ Selecting the operation\
 By means of the *Type selector*, you can choose to delete the documents
 identified by a **DQL Query** or by the list of Unique Ids associated to
 each document.\
-![](./media/image33.png){width="6.5in" height="3.7875in"}\
+![](./media/image33.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_queryOrIds attribute the kind of operation to be performed.
@@ -641,11 +609,11 @@ operation to perform based on the information that the flow is managing.
 If you elected to delete entire documents by Query, you will see the
 following panel:
 
-![](./media/image34.png){width="6.5in" height="3.2840277777777778in"}
+![](./media/image34.png)
 
 ##### You can specify a valid **DQL Query** (in the above picture 'nodejs'.status = 'pending' ). 
 
-![](./media/image35.png){width="6.5in" height="3.2840277777777778in"}
+![](./media/image35.png)
 
 In the above picture,
 
@@ -656,8 +624,7 @@ In the above picture,
 -   The *Results selector* allows to define the documents that will be
     deleted.\
     The possible values are:\
-    ![](./media/image36.png){width="6.5in"
-    height="3.2840277777777778in"}
+    ![](./media/image36.png)
 
     -   ***Default***:\
         In this case the query will be executed without specifying any
@@ -690,8 +657,7 @@ In the above picture,
     unchecking the *Default Options checkbox* and specifying different
     values for the Max View Entries, Max Documents and Max Milliseconds
     parameters).\
-    ![](./media/image14.png){width="3.1578947944007in"
-    height="2.0823797025371826in"}
+    ![](./media/image14.png)
 
 ##### 
 
@@ -700,7 +666,7 @@ In the above picture,
 If you elected to delete entire documents by Query, you will see the
 following panel:
 
-##### ![](./media/image37.png){width="6.472222222222222in" height="2.8194444444444446in"} You can specify a comma-separated list of **unique Ids** (in the above picture F3621B43510933A88825831D00474F2D, E2510A3A32409822F77714720C99363E1C).
+![](./media/image37.png) You can specify a comma-separated list of **unique Ids** (in the above picture F3621B43510933A88825831D00474F2D, E2510A3A32409822F77714720C99363E1C).
 
 -   The *Doc Ids input* can be left empty in the editor. You can use the
     msg.DDB\_unids input attribute (which is, also, a comma-separated
@@ -711,14 +677,14 @@ following panel:
 If you want to delete items within documents by specifying a **DQL
 Query**, you will see the following panel:
 
-![](./media/image38.png){width="6.5in" height="3.311111111111111in"}
+![](./media/image38.png)
 
 You can specify a valid **DQL Query** (in the above picture
 'nodejs'.status = 'pending' ) and a comma-separated list of item names
 (in the above picture customer, amount). The *Item Names input* field
 defines the items that will be removed from the selected documents.
 
-![](./media/image39.png){width="6.5in" height="3.3097222222222222in"}
+![](./media/image39.png)
 
 In the above picture:
 
@@ -729,8 +695,7 @@ In the above picture:
 -   The *Results selector* allows to define the documents that will be
     deleted.\
     The possible values are:\
-    ![](./media/image40.png){width="6.5in"
-    height="3.2840277777777778in"}
+    ![](./media/image40.png)
 
     -   ***Default***:\
         In this case the query will be executed without specifying any
@@ -763,8 +728,7 @@ In the above picture:
     unchecking the *Default Options checkbox* and specifying different
     values for the Max View Entries, Max Documents and Max Milliseconds
     parameters).\
-    ![](./media/image14.png){width="3.1578947944007in"
-    height="2.0823797025371826in"}
+    ![](./media/image14.png)
 
 -   The *Item Names input* can be left empty in the editor. You can use
     the msg.DDB\_itemNames input attribute (which is a comma-separeted
@@ -775,8 +739,7 @@ In the above picture:
 If you want to replace items within documents by specifying a list of
 **unique ids**, you will see the following panel:
 
-![](./media/image41.png){width="6.152777777777778in"
-height="3.2916666666666665in"}
+![](./media/image41.png)
 
 You can specify a comma-separated list of **unique Ids** (in the above
 picture F3621B43510933A88825831D00474F2D,
@@ -798,20 +761,17 @@ the selected documents.
 ##### Controlling the behavior and appearance of your instance
 
 -   You can specify the behavior of the API in case of error\
-    ![](./media/image16.png){width="4.4644750656167975in"
-    height="0.9473687664041994in"}
+    ![](./media/image16.png)
 
 -   Do not forget to give a meaningful name to your newly created node\
-    ![](./media/image17.png){width="3.5259208223972003in"
-    height="0.9924814085739283in"}
+    ![](./media/image17.png)
 
 ##### Output
 
 If the execution of the node successfully completes, the following
 outputs will be provided:
 
-![](./media/image42.png){width="3.2916666666666665in"
-height="2.513888888888889in"}
+![](./media/image42.png)
 
 The DDB\_docs array provides a list of Unique Ids representing the
 documents that have been deleted or the items of which have been
@@ -820,8 +780,7 @@ deleted.
 The DDB\_result object contains the additional outputs provided by the
 API, including the total number of documents matching the query, the
 start index and the count value.\
-![](./media/image19.png){width="2.4027777777777777in"
-height="2.2916666666666665in"}
+![](./media/image19.png)
 
 ### Create Documents node
 
@@ -834,12 +793,12 @@ Documents.
 
 Clicking on the instance of the node, you can see the online help in the
 rightmost panel of the Node-RED editor:\
-![](./media/image43.png){width="6.5in" height="3.201388888888889in"}
+![](./media/image43.png)
 
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image44.png){width="6.5in" height="2.845138888888889in"}\
+![](./media/image44.png)\
 This provides access to the library of **dominodb configurations**.
 
 This node is very simple to use.\
@@ -856,25 +815,22 @@ used.
 Here below is a simple example of how this attribute can be built by a
 **Function Node** and passed to **the Replace Doc/Items node**.
 
-![](./media/image45.png){width="6.5in" height="2.44375in"}
+![](./media/image45.png){
 
 ##### Controlling the behavior and appearance of your instance
 
 -   You can specify the behavior of the API in case of error\
-    ![](./media/image16.png){width="4.1193186789151355in"
-    height="0.8741262029746282in"}
+    ![](./media/image16.png)
 
 -   Do not forget to give a meaningful name to your newly created node\
-    ![](./media/image17.png){width="3.1328674540682413in"
-    height="0.8818438320209974in"}
+    ![](./media/image17.png)
 
 ##### Output
 
 If the execution of the node successfully completes, the following
 outputs will be provided:
 
-![](./media/image46.png){width="3.7083333333333335in"
-height="2.5833333333333335in"}
+![](./media/image46.png)
 
 The DDB\_docs array provides a list of Unique Ids representing the
 documents that have been created.
@@ -904,7 +860,7 @@ This module implements the following new **NodeJS APIs**
 
 Clicking on the instance of the node, you can see the online help in the
 rightmost panel of the Node-RED editor:\
-![](./media/image47.png){width="6.5in" height="4.113194444444445in"}
+![](./media/image47.png)
 
 The help describes the behavior of the node as well as all the input and
 output parameters for the node itself.
@@ -912,14 +868,14 @@ output parameters for the node itself.
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image48.png){width="6.5in" height="3.7395833333333335in"}\
+![](./media/image48.png)\
 This provides access to the library of **dominodb configurations**.
 
 Selecting the operation\
 By means of the *Operation selector*, you can choose which operation you
 want to perform on a given Document.
 
-![](./media/image49.png){width="6.5in" height="3.5083333333333333in"}\
+![](./media/image49.png)\
 \
 It is, also, possible to configure the node to delegate to the incoming
 msg.DDB\_documentOp attribute the kind of operation to be performed.
@@ -928,8 +884,7 @@ operation to perform based on the information that the flow is managing.
 
 Read Document
 
-![](./media/image50.png){width="6.180555555555555in"
-height="2.736111111111111in"}
+![](./media/image50.png)
 
 When selecting the **Read Document option**, you can specify a valid
 **document id** (in the above picture 1B8A3FB273D6C3558825831F005ADC30 )
@@ -946,7 +901,7 @@ amount, description as comma-separated items) to be retrieved.
 
 The output is represented here:
 
-![](./media/image51.png){width="2.513888888888889in" height="2.125in"}
+![](./media/image51.png)
 
 The msg.DDB\_doc is an object representing the document that has been
 retrieved, including all the items you asked to retrieve.
@@ -956,8 +911,7 @@ retrieved.
 
 ##### Replace Document
 
-![](./media/image52.png){width="4.263888888888889in"
-height="2.5694444444444446in"}
+![](./media/image52.png)
 
 When selecting the **Replace Document option**, you can specify a valid
 **document id** (in the above picture 1B8A3FB273D6C3558825831F005ADC30 )
@@ -971,13 +925,11 @@ items for the selected Document.
 -   The *Item Values input* can be left empty in the editor. You can use
     the msg.DDB\_itemValues input attribute. This attribute is an array
     of objects formatted in the following way:\
-    ![](./media/image53.png){width="4.083333333333333in"
-    height="1.0138888888888888in"}
+    ![](./media/image53.png)
 
 The output is represented here:
 
-![](./media/image54.png){width="2.6944444444444446in"
-height="1.8472222222222223in"}
+![](./media/image54.png)
 
 The msg.DDB\_doc is an object representing the document that has been
 replaced, including all the items you asked to replace.
@@ -987,8 +939,7 @@ replaced.
 
 ##### Delete Document
 
-![](./media/image55.png){width="4.319444444444445in"
-height="2.7777777777777777in"}
+![](./media/image55.png)
 
 When selecting the **Delete Document option**, you can specify a valid
 **document id** (in the above picture B1B5B6A6D2D1A991882583440056F01C).
@@ -998,8 +949,7 @@ When selecting the **Delete Document option**, you can specify a valid
 
 The output is represented here:
 
-![](./media/image56.png){width="2.6944444444444446in"
-height="1.3472222222222223in"}
+![](./media/image56.png)
 
 The msg.DDB\_doc is an empty object.
 
@@ -1008,8 +958,7 @@ deleted.
 
 ##### Create Document
 
-![](./media/image57.png){width="4.194444444444445in"
-height="2.6666666666666665in"}
+![](./media/image57.png)
 
 When selecting the **Create Document option**, you can specify a
 comma-separated list of itemName/itemValues pairs (in the following
@@ -1019,12 +968,11 @@ Document.
 -   The *Item Values input* can be left empty in the editor. You can use
     the msg.DDB\_itemValues input attribute. This attribute is an array
     of objects formatted in the following way:\
-    ![](./media/image53.png){width="4.083333333333333in"
-    height="1.0138888888888888in"}
+    ![](./media/image53.png)
 
 The output is represented here:
 
-![](./media/image58.png){width="2.6805555555555554in" height="1.875in"}
+![](./media/image58.png)
 
 The msg.DDB\_doc is an object representing the document that has been
 created, including all the items you asked to create.
@@ -1034,19 +982,16 @@ created.
 
 ##### Replace Items
 
-![](./media/image59.png){width="4.152777777777778in"
-height="2.6527777777777777in"}
+![](./media/image59.png)
 
 The behavior of this node is very similar to the one of the Replace
 Document. The only difference is that the no new item is inserted but
 items are modified\
-![](./media/image60.png){width="2.6527777777777777in"
-height="1.8888888888888888in"}
+![](./media/image60.png)
 
 ##### Delete Items
 
-![](./media/image61.png){width="4.222222222222222in"
-height="2.7222222222222223in"}
+![](./media/image61.png)
 
 When selecting the **Delete Items option**, you can specify a
 comma-separated list of item Names (in the following picture attr1,
@@ -1059,8 +1004,7 @@ attr2) to be removed from an existing Document.
 
 The output is represented here:
 
-![](./media/image62.png){width="2.6527777777777777in"
-height="1.6805555555555556in"}
+![](./media/image62.png)
 
 The msg.DDB\_doc is an object representing the document whose items have
 been deleted.
@@ -1077,15 +1021,14 @@ The node implements the explainQuery API.
 Selecting the Domino Server and Database\
 You can select the instance of your Domino Database using the
 *Application selector*:\
-![](./media/image63.png){width="6.5in" height="4.800694444444445in"}\
+![](./media/image63.png)\
 This provides access to the library of **dominodb configurations**.
 
 ##### Explaining the Query
 
 The node only accepts one input, the **DQL Query** to be explained:
 
-![](./media/image64.png){width="3.5694444444444446in"
-height="2.3472222222222223in"}
+![](./media/image64.png)
 
 In the picture above, the DQL Query to be explained is represented by
 the string \'nodejs\'.status = \'pending\' .
@@ -1096,8 +1039,7 @@ the string \'nodejs\'.status = \'pending\' .
 
 ##### Output
 
-![](./media/image65.png){width="2.6944444444444446in"
-height="2.3055555555555554in"}
+![](./media/image65.png)
 
 The msg.DDB\_queryExplained contains the output of the relevant API.
 
@@ -1112,4 +1054,4 @@ additional msg.DDB\_fatal attribute representing the reason for the
 error.
 
 You can use a Node-RED **Catch Node** to catch the error.\
-![](./media/image66.png){width="6.5in" height="5.450694444444444in"}
+![](./media/image66.png)
