@@ -1,6 +1,6 @@
 ---
 title: |
-    Simplify the use and the access of the Domino 10 AppDev Pack using NodeRED
+    A Simplify the use and the access of the Domino 10 AppDev Pack using NodeRED
 ---
 
 Table Of Contents
