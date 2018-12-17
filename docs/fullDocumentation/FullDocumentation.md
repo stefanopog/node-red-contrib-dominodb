@@ -104,7 +104,7 @@ data that need to be manipulated. Here is an example of the code
 fragment that is required to create a single document using the new
 APIs.
 
-![](./media/image1.png = "5.699301181102363in" x "4.502833552055993in"}
+![](./media/image1.png = "5.699301181102363in" x "4.502833552055993in")
 
 Introducing Node-RED
 ====================
