@@ -7,16 +7,27 @@ Table Of Contents
 =================
 
 [A new set of APIs](#a-new-set-of-apis)
+
 [Introducing Node-RED](#introducing-node-red)
+
 [The Domino 10 Node-RED nodes](#the-domino-10-node-red-nodes)
+
 [The Configuration Node (dominodb)](#the-configuration-node-dominodb)
+
 [Details of the dominodb Node-RED package](#details-of-the-dominodb-node-red-package)
+
 [GetDocuments node](#getdocuments-node)
+
 [Replace Documents / Items node](#replace-documents-items-node)
+
 [Delete Documents / Items node](#delete-documents-items-node)
+
 [Create Documents node](#create-documents-node)
+
 [DocumentMgr node](#documentmgr-node)
+
 [Explain Query node](#explain-query-node)
+
 [Error Handling](#error-handling)
 
 A new set of APIs
