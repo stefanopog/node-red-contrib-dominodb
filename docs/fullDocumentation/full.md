@@ -142,10 +142,9 @@ editor, as shown here:
 
 ![](./media/image3.png)
 
-**[Note]{.underline}:**
+<strong><u>Note: </u></strong>
 
-this article is based on the V 0.9.7 version of the **node-red-contrib-dominodb** package.
-
+this article is based on the V 0.9.7 version of the **node-red-contrib-dominodb** package. \
 This simple set of nodes can be used to quickly and safely access to,
 virtually, all the APIs exposed by the "**domino-db NPM" component**.
 The **"domino-db NPM" component** is a pre-requisite for the Node-RED
@@ -153,7 +152,7 @@ package and needs to be installed before the
 **node-red-contrib-dominodb** Node-RED package (please refer to the
 *Installation section* of the package for details).
 
-**[Note:]{.underline}**
+<strong><u>Note: </u></strong>
 
 In order to enable verbose logging for the nodes contained in the
 **node-red-contrib-dominodb** package, you need to set the value of the
@@ -407,10 +406,10 @@ operation to perform based on the information that the flow is managing.
     **DQL Query** string (as msg.DDB\_query) or for the list of Unique
     Ids (as msg.DDB\_itemValuesById, see later).
 
-**[Note]{.underline}**:
+<strong><u>Note: </u></strong>
 
 This *Type Selector* is only shown if you selected **Replace Items**
-from the previous selector.
+from the previous selector.\
 
 In case you selected **Replace Documents**, the **DQL Query** option is
 not currently supported by the APIs.

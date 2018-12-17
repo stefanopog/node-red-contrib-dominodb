@@ -1,3 +1,7 @@
 Documentation and Examples
 
-[Full](fullDocumentation/full.md)
+[Full Documentation](fullDocumentation/full.md)
+
+[Installation Guide](Installation/installing.html)
+
+[Introduction Article](Article/article.md)
