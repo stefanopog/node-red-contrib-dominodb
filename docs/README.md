@@ -1,7 +1,4 @@
 Documentation and Examples
 
-[Full Documentation](fullDocumentation/full.md)
+Full documentation and examples available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
 
-[Installation Guide](Installation/Installing.html)
-
-[Introduction Article](Article/article.md)
