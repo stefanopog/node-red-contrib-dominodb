@@ -1,6 +1,12 @@
 node-red-contrib-dominodb
 =========================
 
+
+[![](https://img.shields.io/npm/dt/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
+[![](https://img.shields.io/npm/dw/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
+![Domino10](https://img.shields.io/badge/Platform-Domino-%23FEC70B.svg)
+[![](https://img.shields.io/npm/v/node-red-contrib-dominodb.svg?style=plastic)](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
+
 A set of node-red nodes to interact with the new [Domino V10+ NodeJS component](https://www.ibm.com/blogs/collaboration-solutions/2018/10/08/everything-need-know-domino-v10-node-js/).
 Meet us at [DestinationDomino](ibm.com/destinationdomino) and follow us at [#DominoForever](https://twitter.com/hashtag/dominoforever)
 
@@ -106,7 +112,6 @@ This packages installs using the standard **Manage Palette** feature in the Node
 
 # **Limitations**
 * The **Database node** only supports <strong style="color:red">NOT AUTHETICATED</strong> connections
-* There is **no support yet** for the <strong style="color:red">start and count</strong> options when using **DQL**
    
 # **Known Issues**
 * None at the moment but we are sure you will help us finding them :-) 
