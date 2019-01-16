@@ -453,7 +453,7 @@ msg.DDB_itemValues[0].value = 'the value for the item' ;
 ...
             </pre>
             <br />
-            This attribute is <strong>only cosidered</strong> if the operation is <code>delete items by query</code> or <code>delete items by unids</code>. In these
+            This attribute is <strong>only cosidered</strong> if the operation is <code>replace items by query</code> or <code>replace items by unids</code>. In these
             situations, the attribute provides replacement values that apply to each document that is selected by the <strong>DQL query</strong> or by the 
             <strong>list of unids</strong>.
             <br /><br />
@@ -462,7 +462,7 @@ msg.DDB_itemValues[0].value = 'the value for the item' ;
             <strong>Note : </strong>If using the Configuration Panel, the overall value of the attribute is a <strong>comma separated list</strong> of 
             <code>name = value</code> pairs. The algorithm splits first on <code>, (comma)</code> and, then, on <code>= (equal sign)</code>. 
             <br /><br />
-            <strong>Note : </strong>If the attribute is not present, then the <code>delete items by query</code> operation will fail. If the <code>delete items by unids</code>
+            <strong>Note : </strong>If the attribute is not present, then the <code>replace items by query</code> operation will fail. If the <code>replace items by unids</code>
             operation is chosen, then the operation will continue
         </dd>
 
@@ -485,7 +485,7 @@ msg.DDB_itemValuesById[1]['@unid'] = "..."
 ...
             </pre>
             <br />
-            This attribute is <strong>only cosidered</strong> if the operation is <code>delete documents by unids</code> or <code>delete items by unids</code>. 
+            This attribute is <strong>only cosidered</strong> if the operation is <code>replace documents by unids</code> or <code>replace items by unids</code>. 
             In these situations, the attribute provides replacement values that apply to each document as specified by the <code>'@unid'</code> attribute.
             <br /><br />
             <strong>Note : </strong>If any of the objects in the array <strong>does not</strong> provide the <code>'@unid'</code> attribute, the operation
