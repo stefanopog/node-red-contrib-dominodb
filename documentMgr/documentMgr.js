@@ -16,7 +16,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
+    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -26,8 +26,6 @@ module.exports = function(RED) {
     //  ON Handler
     //
     this.on("input", function(msg) {
-      const betweenQuotes = /"([^"\\]*(\\.[^"\\]*)*)"/;
-      const parExp = /(\S+)\s*=\s*([^\s"]+|"[^"]*")/;
       let documentOp = '';
       let unid  = null;
       let itemNames = [];
@@ -39,7 +37,7 @@ module.exports = function(RED) {
         obj[item[keyField]] = item.value;
         return obj;
       }, {});
-//
+      //
       //  Check for token on start up
       //
       if (!node.application) {
@@ -90,29 +88,10 @@ module.exports = function(RED) {
           } else {
             if (config.itemValues.trim() !== '') {
               //
-              //  List of properties is a comma-separated list of  name=value
+              //  List of properties is a comma-separated list of  name="value"
               //
-              let theList = config.itemValues.trim().split(',');
-              for (let i=0; i < theList.length; i++) {
-                let tt = theList[i].match(parExp);
-                if (tt) {
-                  //
-                  //  well written name = value   pair
-                  //
-                  let theItem = {};
-                  theItem.name = tt[1].trim();
-                  let tmpS = tt[2].trim();
-                  if (tmpS.match(betweenQuotes)) {
-                    theItem.value = tmpS.match(betweenQuotes)[1];
-                  } else {
-                    theItem.value = tmpS;
-                  }
-                  _itemValues.push(theItem);
-                }
-              }
-              //
-              //  Now we should have processed all the pairs in the config input
-              //
+              _itemValues = __getNameValueArray(config.itemValues);
+              __logJson(__moduleName, __isDebug, 'Parsed itemValues', _itemValues);
             } else {
               //
               //  if inpput comes as "msg.DDB_itemValues" we assume that it is already formatted as an array of name and values

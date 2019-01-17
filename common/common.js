@@ -50,6 +50,17 @@ function __logWarning(moduleName, theString, theNode) {
 }
 
 function __getOptionValue(moduleName, theLimits, theOption, fromConfig, fromMsg, theNode) {
+    //
+    //  This function retrieves a NUMERIC value which can be provided
+    //  - either by the Configuration Panel
+    //  - or by an input msg. attribute
+    //
+    //  The value from the COnfiguration Panel takes precedence over the input msg. attribute
+    //
+    //  If no value is provided, an WARNING is generated
+    //
+    //  The value is returned in an object (named array) which can either be created by this function or taken as an input parameter
+    //
     var value = 0;
     if ((fromConfig.trim() === '') && ((fromMsg === undefined) || (fromMsg.trim() === ''))) {
         __logWarning(moduleName, theOption + ' set to default', theNode);
@@ -76,6 +87,17 @@ function __getOptionValue(moduleName, theLimits, theOption, fromConfig, fromMsg,
 }
 
 function __getMandatoryInputFromSelect(moduleName, fromConfig, fromMsg, label, values, theMsg, theNode) {
+    //
+    //  This function gets the final value of an input which could be provided by :
+    //  - either the Configuration Panel
+    //  - or by an input msg. attribute
+    //
+    //  The Configuration Panel can provide the user the choice among the values stored in the "values" input paramter of this function
+    //  with the addition of the "fromMsg" value.
+    //  In case the Configuration Panel is set to be "fromMsg", then the value is taken from the input msg. attribute
+    //
+    //  In case the final value is not in the input "values" paramter array, a NULL value is returned
+    //
     var theValue = null;
     if ((fromConfig.trim() === '') && (!fromMsg || (fromMsg.trim() === ''))) {
         __logError(moduleName, "Missing " + label + " string", null, null, theMsg, theNode);
@@ -103,6 +125,15 @@ function __getMandatoryInputFromSelect(moduleName, fromConfig, fromMsg, label, v
 }
 
 function __getMandatoryInputString(moduleName, fromConfig, fromMsg, label, theMsg, theNode) {
+    //
+    //  This function retrieves a value which can be provided
+    //  - either by the Configuration Panel
+    //  - or by an input msg. attribute
+    //
+    //  The value from the COnfiguration Panel takes precedence over the input msg. attribute
+    //
+    //  If no value is provided, an ERROR is generated
+    //
     var theValue = null;
     if ((fromConfig.trim() === '') && ((fromMsg === undefined) || ((typeof fromMsg) !== 'string') || (fromMsg.trim() === ''))) {
         __logError(moduleName, "Missing " + label + " string", null, null, theMsg, theNode);
@@ -117,6 +148,15 @@ function __getMandatoryInputString(moduleName, fromConfig, fromMsg, label, theMs
 }
 
 function __getOptionalInputString(moduleName, fromConfig, fromMsg, label, theMsg, theNode) {
+    //
+    //  This function retrieves a value which can be provided
+    //  - either by the Configuration Panel
+    //  - or by an input msg. attribute
+    //
+    //  The value from the COnfiguration Panel takes precedence over the input msg. attribute
+    //
+    //  If no value is provided, an WARNING is generated
+    //
     var theValue = null;
     if ((fromConfig.trim() === '') && ((fromMsg === undefined) || ((typeof fromMsg) !== 'string') || (fromMsg.trim() === ''))) {
         __logWarning(moduleName, "Missing " + label + " string", theNode);
@@ -130,4 +170,31 @@ function __getOptionalInputString(moduleName, fromConfig, fromMsg, label, theMsg
     return theValue;
 }
 
-module.exports = {__log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString};
+function __getNameValueArray(inputString) {
+    //
+    //  This function takes a comma-separated input string containing < name = "value" > pairs and returns an array of objects
+    //  where each object has the name and the value attribute
+    //  The < value > can be enclosed in double-quotes or single-quotes in the original string
+    //
+    const betweenQuotes = /((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/;
+    const parExp = /(\w+)\s*=\s*(["'])((?:(?!\2).)*)\2[\s*,\s*]?/g; // https://stackoverflow.com/questions/17007616/regular-expression-to-match-key-value-pairs-where-value-is-in-quotes-or-apostrop
+    var m;
+    var outArray = [];
+    while (m = parExp.exec(inputString)) {
+        let obj = {};
+        obj.name = m[1];
+        obj.value = m[3];
+        outArray.push(obj);
+    }
+    return outArray;
+}
+
+module.exports = {__log, 
+                  __logJson, 
+                  __logError, 
+                  __logWarning, 
+                  __getOptionValue, 
+                  __getMandatoryInputFromSelect, 
+                  __getMandatoryInputString, 
+                  __getOptionalInputString,
+                  __getNameValueArray};

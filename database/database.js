@@ -17,7 +17,7 @@ module.exports = function(RED) {
 
     function D10_dominoDB(config) {
         RED.nodes.createNode(this, config);
-        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
+        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
 
         this.name = config.displayName;
         this.displayName = config.displayName;

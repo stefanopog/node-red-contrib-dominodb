@@ -19,6 +19,14 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
 
 # **Changes**
+### V 0.9.8 Bug Fixing and Documentation
+* Fixing a bug in processing `name = "value"` pairs in **documentMgr** and **replaceDcouments** modules
+  * Now, you can use the `value` field enclosed in single or double quotes
+  * commas within the `value` string do not break the processing
+* Fixing a Documentation issue in the **replaceDocuments** online help
+* Adding *badges* and *Counters* to the `README` file
+
+
 ### V 0.9.6 Introducing *count* and *start*
 * The **GetDocuments**, **Replace Documents/items** and **Delete Documents/Items** node now support the `start`and `count` configuration options. 
   * These options **only apply** to operations that are based on **DQL Queries**.
