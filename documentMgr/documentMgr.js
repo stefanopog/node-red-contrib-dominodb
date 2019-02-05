@@ -16,7 +16,16 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
+    const { __log, 
+            __logJson, 
+            __logError, 
+            __logWarning, 
+            __getOptionValue, 
+            __getMandatoryInputFromSelect, 
+            __getMandatoryInputString, 
+            __getOptionalInputString, 
+            __getNameValueArray,
+            __getItemValuesFromMsg } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -32,11 +41,6 @@ module.exports = function(RED) {
       let itemValues = [];
       let options = {};
       let options2 = {};
-      const arrayToObject = (array, keyField) =>
-      array.reduce((obj, item) => {
-        obj[item[keyField]] = item.value;
-        return obj;
-      }, {});
       //
       //  Check for token on start up
       //
@@ -54,7 +58,7 @@ module.exports = function(RED) {
       //  Document Id
       //
       if (documentOp !== 'create') {
-        unid = __getMandatoryInputString(__moduleName, config.unid, msg.DDB_unid, 'Document Id', msg, node);
+        unid = __getMandatoryInputString(__moduleName, config.unid, msg.DDB_unid, config.documentOp, 'Document Id', msg, node);
         if (!unid) return;
       } else {
         unid = '';
@@ -65,7 +69,7 @@ module.exports = function(RED) {
       switch (documentOp) {
         case 'read':
         case 'deleteItems':
-          itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, 'itemNames', msg, node);
+          itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, config.documentOp, 'itemNames', msg, node);
           if (!itemNames) return;
           //
           //  Transform comma-separated string into array
@@ -78,8 +82,7 @@ module.exports = function(RED) {
         case 'create':
         case 'replace':
         case 'replaceItems':
-          let _itemValues = [];
-          if ((config.itemValues.trim() === '') && (!msg.DDB_itemValues || !Array.isArray(msg.DDB_itemValues))) {
+          if ((config.itemValues.trim() === '') && !msg.DDB_itemValues) {
             __logError(__moduleName, "No Item Values", null, null, msg, node);
             //
             //  No Items to be modified! 
@@ -90,25 +93,20 @@ module.exports = function(RED) {
               //
               //  List of properties is a comma-separated list of  name="value"
               //
-              _itemValues = __getNameValueArray(config.itemValues);
-              __logJson(__moduleName, __isDebug, 'Parsed itemValues', _itemValues);
+              itemValues = __getNameValueArray(config.itemValues);
             } else {
               //
-              //  if inpput comes as "msg.DDB_itemValues" we assume that it is already formatted as an array of name and values
+              //  if inpput comes as "msg.DDB_itemValues" we chek if it is already a final object or an array
+              //  If it is an array, then it is transformed into object
               //
-              _itemValues = msg.DDB_itemValues;
+              itemValues = __getItemValuesFromMsg(msg.DDB_itemValues);
             }
+            __logJson(__moduleName, __isDebug, 'Parsed itemValues', itemValues);
           }
-          //
-          //  Now transform the array into an object
-          //
-          itemValues = arrayToObject(_itemValues, "name");
           //
           //  And calculate the itemNames into its array
           //
-          for (let i=0; i < _itemValues.length; i++){
-            itemNames.push(_itemValues[i].name);
-          }
+          itemNames = Object.getOwnPropertyNames(itemValues);
           break;
       }
       //
@@ -134,18 +132,14 @@ module.exports = function(RED) {
           options = {itemNames : itemNames};
           break;
       }
+      const serverConfig = node.application.getServerConfig();
+      const databaseConfig = node.application.getDatabaseConfig();
+      __logJson(__moduleName, __isDebug, "executing operation " + documentOp + " with the following serverConfig: ", serverConfig, true);
+      __logJson(__moduleName, __isDebug, "executing operation " + documentOp + " with the following ddbConfig: ", databaseConfig);
       __logJson(__moduleName, __isDebug, "executing operation " + documentOp + " with the following options: ", options);
-      
-      const serverConfig = {
-        hostName: creds.D10_server, 
-        connection: {
-          port: creds.D10_port, 
-        },
-      };
-      const databaseConfig = {
-        filePath: creds.D10_db
-      };
-
+      //
+      //  Executing
+      //
       useServer(serverConfig).then(async server => {
         //
         //  Get the Domino Database

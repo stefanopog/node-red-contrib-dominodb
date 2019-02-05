@@ -17,13 +17,17 @@ module.exports = function(RED) {
 
     function D10_dominoDB(config) {
         RED.nodes.createNode(this, config);
-        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
+        const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString } = require('../common/common.js');
 
         this.name = config.displayName;
         this.displayName = config.displayName;
         this.D10_server = config.D10_server;
         this.D10_db = config.D10_db;
         this.D10_port = config.D10_port;
+        this.D10_isSecure = config.D10_isSecure;
+        this.D10_rootCert = config.D10_rootCert;
+        this.D10_clientCert = config.D10_clientCert;
+        this.D10_clientKey = config.D10_clientKey;
         __log(__moduleName, true, "###############################################");
         __logJson(__moduleName, true, "Credentials for [" + this.id + "] " + (this.name ? this.name : ""), this.credentials);
         __log(__moduleName, true, "###############################################");
@@ -45,36 +49,79 @@ module.exports = function(RED) {
         this.getCredentials = () => {
             return RED.nodes.getCredentials(this.id);
         };
+
+        this.getServerConfig = () => {
+            var tmpCred = RED.nodes.getCredentials(this.id);
+            /*
+            const fs = require('fs');
+            const path = require('path');
+            const readFile = fileName => {
+              try {
+                return fs.readFileSync(path.resolve(fileName));
+              } catch (error) {
+                return undefined;
+              }
+            };
+            const rootCertificate = readFile('/Users/stefano/certificates/ca.crt');
+            const clientCertificate = readFile('/Users/stefano/certificates/pquotes.crt');
+            const clientKey = readFile('/Users/stefano/certificates/pquotes.key');
+            */
+            if (tmpCred.D10_isSecure) {
+                const rootCertificate = Buffer.from(tmpCred.D10_rootCert);
+                const clientCertificate = Buffer.from(tmpCred.D10_clientCert);
+                const clientKey = Buffer.from(tmpCred.D10_clientKey);
+                return {
+                    hostName: tmpCred.D10_server, 
+                    connection: {
+                        port: tmpCred.D10_port, 
+                        secure: true
+                    },
+                    credentials: {
+                        rootCertificate,
+                        clientCertificate,
+                        clientKey
+                    }        
+                }
+            } else {
+                return {
+                    hostName: tmpCred.D10_server, 
+                    connection: {
+                        port: tmpCred.D10_port
+                    }
+                }
+            }
+        };
+
+        this.getDatabaseConfig = () => {
+            var tmpCred = RED.nodes.getCredentials(this.id);
+            return {
+                filePath: tmpCred.D10_db
+            };
+        }
     };
     
     //
-    //  Implementing Basic Authentication
+    //  This serves the LineReader.js script to the HTML interface
+    //  See https://groups.google.com/forum/#!topic/node-red/MFQKemDe-l4
     //
-    RED.httpAdmin.get('/credentials', function(req, res) {
-        if (!req.query.D10_server || !req.query.D10_db || !req.query.D10_port || !req.query.displayName) {
-            res.send(400);
-            return;
-        }
-        var node_id = req.query.id;
-        var credentials = {
-            D10_server: req.query.D10_server,
-            D10_db: req.query.D10_db,
-            D10_port: req.query.D10_port,
-            displayName: req.query.displayName
-        };
-        __logJson(__moduleName, true, "*** NEW CREDENTIALS ****", credentials);
-        RED.nodes.addCredentials(node_id, credentials);
-        res.send(200);
-    });
+	RED.httpAdmin.get('/dominodb/LineReader.js', function(req, res){
+        var path = require('path');
+        var filename = path.join(__dirname , 'static', 'LineReader.js');
+		res.sendFile(filename);
+	});
 
     RED.nodes.registerType(
         "dominodb",
         D10_dominoDB, 
         {
             credentials: {
-                D10_server: {type:"text"},
-                D10_db: {type:"text"},
-                D10_port: {type:"text"},
+                D10_server: {type: "text"},
+                D10_db: {type: "text"},
+                D10_port: {type: "text"},
+                D10_isSecure: {type: "boolean"},
+                D10_rootCert: {type: "text"},
+                D10_clientCert: {type: "text"},
+                D10_clientKey: {type: "text"},
                 displayName: {type: "text"}
             }
         }

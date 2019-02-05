@@ -4,7 +4,7 @@ node-red-contrib-dominodb
 
 [![](https://img.shields.io/npm/dt/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
 [![](https://img.shields.io/npm/dw/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
-![Domino10](https://img.shields.io/badge/Platform-Domino-%23FEC70B.svg)
+[![Domino10](https://img.shields.io/badge/Platform-Domino-%23FEC70B.svg)](http://ibm.com/destinationdomino)
 [![](https://img.shields.io/npm/v/node-red-contrib-dominodb.svg?style=plastic)](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
 
 A set of node-red nodes to interact with the new [Domino V10+ NodeJS component](https://www.ibm.com/blogs/collaboration-solutions/2018/10/08/everything-need-know-domino-v10-node-js/).
@@ -16,9 +16,38 @@ Meet us at [DestinationDomino](ibm.com/destinationdomino) and follow us at [#Dom
 This set of nodes is intended to be provide a simple-to-use NodeRED interface to the the **dominodb nodeJS package**.
 As such, it assumes that the  **dominodb nodeJS package** is already installed [see the Installation section](#Installation) on your NodeRED instance. 
 
-Full documentation, including sample NodeRed flows using these nodes, is available in the Documentation Directory of the [corresponding Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/tree/master/docs)
+Full documentation, including sample NodeRed flows using these nodes, is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/).
 
 # **Changes**
+### V 1.0.0 Secure Connection and enhancements
+* Now the **dominodb Configuration node** supports <strong style="color:red">secure connections to the Proton server</strong>. You can import, via the Configuration Node, the *certificates* from the **Proton component** 
+* Addressing the [issue reported here](https://github.com/stefanopog/node-red-contrib-dominodb/issues/2)
+* For the **DocumentMgr and ReplaceDocuments/Items nodes** it is now possible to pass the `msg.DDB_itemValues` input parameter as an object. Each property of the object reflects the Domino itemName you need to modify; the value of the property is the new value to be entered
+  * The new supported format looks like the following:
+<pre>
+msg.DDB_itemValues = {};
+msg.DDB_itemValues.ActionDate = {type : 'datetime', data : X.toISOString().substring(0,19)+'Z'};
+msg.DDB_itemValues.alfa = 'tata';
+msg.DDB_itemValues.theNumber = 123.45;
+</pre>
+  * the old style, where `msg.DDB_itemValues` was an array of objects, where each object had a `name` and a `value` attribute is still supported for backward compatibility. It looks like this and it is much more verbose then the new style:
+<pre>
+msg.DDB_itemValues = [];
+msg.DDB_itemValues[0] = {};
+msg.DDB_itemValues[0].name = 'ActionDate';
+msg.DDB_itemValues[0].value = {type : 'datetime', data : X.toISOString().substring(0,19)+'Z'};
+msg.DDB_itemValues[1] = {};
+msg.DDB_itemValues[1].name = 'alfa';
+msg.DDB_itemValues[1].value = 'this is the value';
+msg.DDB_itemValues[2] = {};
+msg.DDB_itemValues[2].name = 'theNumber';
+msg.DDB_itemValues[2].value = 123.45;
+</pre>
+* When the `ìtemValues` input is entered via the **Configuration Panel**, it is now possible to enter **dates and numbers**using the following format: `alfa = 1234.34, beta = "the string",  delta = @dt('2018-08-01T11:18:00Z')`
+  * Dates need to be prefixed with the `@dt('` prefix and ended with `')`
+  * Numbers are not quoted
+  
+
 ### V 0.9.8 Bug Fixing and Documentation
 * Fixing a bug in processing `name = "value"` pairs in **documentMgr** and **replaceDcouments** modules
   * Now, you can use the `value` field enclosed in single or double quotes
@@ -80,7 +109,7 @@ This packages installs using the standard **Manage Palette** feature in the Node
 ### Prerequisites
 * This package depends on the **AppDev package** distributed by **HCL**. You need to install that package **separately**.
 * It is **IMPORTANT** that the **dominodb AppDev pack** would be available as `@domino/domino-db` for the **require** statement used by this NodeRed package !
-* A very raw guide to install the **AppDev package** on your local machine or on an **IBM Cloud NodeRed Starter kit** is available in the [docs Github repository](https://github.com/stefanopog/node-red-contrib-dominodb/blob/master/docs/Using%20the%20new%20Domino%20V10%20NodeRED%20nodes%202.pdf) as **Using the new Domino V10 NodeRED nodes 2.pdf**
+* A very raw guide to install the **AppDev package** on your local machine or on an **IBM Cloud NodeRed Starter kit** is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/docs/images/envSetup/envSetup.pdf) as **Using the new Domino V10 NodeRED nodes 2.pdf**
 
 
 # **Package Details**
@@ -119,7 +148,7 @@ This packages installs using the standard **Manage Palette** feature in the Node
     * `replaceItems` to modify an existing Domino Document by specifying new values for existing items or new items to be added
 
 # **Limitations**
-* The **Database node** only supports <strong style="color:red">NOT AUTHETICATED</strong> connections
+* No known limitations
    
 # **Known Issues**
 * None at the moment but we are sure you will help us finding them :-) 

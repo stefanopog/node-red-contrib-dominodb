@@ -17,7 +17,16 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
+    const { __log, 
+      __logJson, 
+      __logError, 
+      __logWarning, 
+      __getOptionValue, 
+      __getMandatoryInputFromSelect, 
+      __getMandatoryInputString, 
+      __getOptionalInputString, 
+      __getNameValueArray,
+      __getItemValuesFromMsg } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -53,7 +62,7 @@ module.exports = function(RED) {
       //
       //  Comma-separated list of itemNames
       //
-      itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, 'itemNames', msg, node);
+      itemNames = __getMandatoryInputString(__moduleName, config.itemNames, msg.DDB_itemNames, 'BOTH', 'itemNames', msg, node);
       if (!itemNames) return;
       //
       //  Transform comma-separated string into array
@@ -69,7 +78,7 @@ module.exports = function(RED) {
         //
         //  DQL Query String
         //
-        query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, 'DQL query', msg, node);
+        query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, config.queryOrId, 'DQL query', msg, node);
         if (!query) return;
         //
         //  Check how many records to retrieve
@@ -116,7 +125,7 @@ module.exports = function(RED) {
         //
         //  Comma-separated list of docunids
         //
-        unids = __getMandatoryInputString(__moduleName, config.unids, msg.DDB_unids, 'DocUnids', msg, node);
+        unids = __getMandatoryInputString(__moduleName, config.unids, msg.DDB_unids, config.queryOrId, 'DocUnids', msg, node);
         if (!unids) return;
         //
         //  Transform comma-separated string into array
@@ -138,17 +147,14 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
+      const serverConfig = node.application.getServerConfig();
+      const databaseConfig = node.application.getDatabaseConfig();
+      __logJson(__moduleName, __isDebug, "executing with the following serverConfig: ", serverConfig, true);
+      __logJson(__moduleName, __isDebug, "executing with the following ddbConfig: ", databaseConfig);
       __logJson(__moduleName, __isDebug, "executing with the following options: ", bulkCmdConfig);
-      const serverConfig = {
-        hostName: creds.D10_server, 
-        connection: {
-          port: creds.D10_port, 
-        },
-      };
-      const databaseConfig = {
-        filePath: creds.D10_db
-      };
-      
+      //
+      //  Executing
+      //
       useServer(serverConfig).then(async server => {
         //
         //  Get the Domino Database

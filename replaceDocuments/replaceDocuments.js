@@ -17,7 +17,16 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
+    const { __log, 
+      __logJson, 
+      __logError, 
+      __logWarning, 
+      __getOptionValue, 
+      __getMandatoryInputFromSelect, 
+      __getMandatoryInputString, 
+      __getOptionalInputString, 
+      __getNameValueArray,
+      __getItemValuesFromMsg } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -37,11 +46,6 @@ module.exports = function(RED) {
       let itemValuesById = null;
       let queryLimits = null;
       let bulkCmdConfig = {};
-      const arrayToObject = (array, keyField) =>
-      array.reduce((obj, item) => {
-        obj[item[keyField]] = item.value;
-        return obj;
-      }, {});
       //
       //  Check for token on start up
       //
@@ -94,7 +98,7 @@ module.exports = function(RED) {
         //
         //  In this case we may need itemValues
         //
-        if ((config.itemValues.trim() === '') && (!msg.DDB_itemValues || !Array.isArray(msg.DDB_itemValues))) {
+        if ((config.itemValues.trim() === '') && !msg.DDB_itemValues) {
           //
           //  No Items to be modified! 
           //  This would be an INFORMATION if "ids" but an error if "Query"
@@ -107,23 +111,19 @@ module.exports = function(RED) {
             itemValues = null
           }
         } else {
-          let _itemValues = [];
           if (config.itemValues.trim() !== '') {
-              //
-              //  List of properties is a comma-separated list of  name="value"
-              //
-              _itemValues = __getNameValueArray(config.itemValues);
-              __logJson(__moduleName, __isDebug, 'Parsed itemValues', _itemValues);
+            //
+            //  List of properties is a comma-separated list of  name="value"
+            //
+            itemValues = __getNameValueArray(config.itemValues);
           } else {
             //
-            //  if inpput comes as "msg.DDB_itemValues" we assume that it is already formatted as an array of name and values
+            //  if inpput comes as "msg.DDB_itemValues" we chek if it is already a final object or an array
+            //  If it is an array, then it is transformed into object
             //
-            _itemValues = msg.DDB_itemValues;
+            itemValues = __getItemValuesFromMsg(msg.DDB_itemValues);
           }
-          //
-          //  Now transform the array into an object
-          //
-          itemValues = arrayToObject(_itemValues, "name");
+          __logJson(__moduleName, __isDebug, 'Parsed itemValues', itemValues);
         }
       }
       //
@@ -133,7 +133,7 @@ module.exports = function(RED) {
         //
         //  DQL Query String
         //
-        query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, 'DQL query', msg, node);
+        query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, config.queryOrId, 'DQL query', msg, node);
         if (!query) return;
         //
         //  Check how many records to retrieve
@@ -201,17 +201,14 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
+      const serverConfig = node.application.getServerConfig();
+      const databaseConfig = node.application.getDatabaseConfig();
+      __logJson(__moduleName, __isDebug, "executing with the following serverConfig: ", serverConfig, true);
+      __logJson(__moduleName, __isDebug, "executing with the following ddbConfig: ", databaseConfig);
       __logJson(__moduleName, __isDebug, "executing with the following options: ", bulkCmdConfig);
-      const serverConfig = {
-        hostName: creds.D10_server, 
-        connection: {
-          port: creds.D10_port, 
-        },
-      };
-      const databaseConfig = {
-        filePath: creds.D10_db
-      };
-      
+      //
+      //  Executing
+      //
       useServer(serverConfig).then(async server => {
         //
         //  Get the Domino Database

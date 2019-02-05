@@ -17,8 +17,16 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     this.application = RED.nodes.getNode(config.application);
     var node = this;
-    const { __log, __logJson, __logError, __logWarning, __getOptionValue, __getMandatoryInputFromSelect, __getMandatoryInputString, __getOptionalInputString, __getNameValueArray } = require('../common/common.js');
-
+    const { __log, 
+      __logJson, 
+      __logError, 
+      __logWarning, 
+      __getOptionValue, 
+      __getMandatoryInputFromSelect, 
+      __getMandatoryInputString, 
+      __getOptionalInputString, 
+      __getNameValueArray,
+      __getItemValuesFromMsg } = require('../common/common.js');
     //
     //  Get the dominoDB runtime
     //
@@ -41,7 +49,7 @@ module.exports = function(RED) {
       //
       //  DQL Query String
       //
-      query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, 'DQL query', msg, node);
+      query = __getMandatoryInputString(__moduleName, config.query, msg.DDB_query, 'BOTH', 'DQL query', msg, node);
       if (!query) return;
       //
       //  Prepare the Configuration to be executed
@@ -50,17 +58,14 @@ module.exports = function(RED) {
       //
       //  Preparing
       //
+      const serverConfig = node.application.getServerConfig();
+      const databaseConfig = node.application.getDatabaseConfig();
+      __logJson(__moduleName, __isDebug, "executing with the following serverConfig: ", serverConfig, true);
+      __logJson(__moduleName, __isDebug, "executing with the following ddbConfig: ", databaseConfig);
       __logJson(__moduleName, __isDebug, "executing with the following options: ", explainConfig);
-      const serverConfig = {
-        hostName: creds.D10_server, 
-        connection: {
-          port: creds.D10_port, 
-        },
-      };
-      const databaseConfig = {
-        filePath: creds.D10_db
-      };
-      
+      //
+      //  Executing
+      //
       useServer(serverConfig).then(async server => {
         //
         //  Get the Domino Database
