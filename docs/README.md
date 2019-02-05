@@ -148,7 +148,7 @@ This packages installs using the standard **Manage Palette** feature in the Node
     * `replaceItems` to modify an existing Domino Document by specifying new values for existing items or new items to be added
 
 # Recognition
-The `LineReader` package from **Matthew Meyers** ([see here](https://github.com/mgmeyers/LineReader/blob/master/LICENSE.md)) has been used.
+The `LineReader` package from **Matthew Meyers** ([see here](https://github.com/mgmeyers/LineReader)) has been used.
 Thank you Matthew for allowing me to use it
 
 # **Limitations**
