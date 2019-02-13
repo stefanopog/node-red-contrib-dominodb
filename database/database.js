@@ -66,7 +66,7 @@ module.exports = function(RED) {
             const clientCertificate = readFile('/Users/stefano/certificates/pquotes.crt');
             const clientKey = readFile('/Users/stefano/certificates/pquotes.key');
             */
-            if (tmpCred.D10_isSecure) {
+            if (tmpCred.D10_isSecure && (tmpCred.D10_isSecure === "true")) {
                 const rootCertificate = Buffer.from(tmpCred.D10_rootCert);
                 const clientCertificate = Buffer.from(tmpCred.D10_clientCert);
                 const clientKey = Buffer.from(tmpCred.D10_clientKey);
@@ -118,7 +118,7 @@ module.exports = function(RED) {
                 D10_server: {type: "text"},
                 D10_db: {type: "text"},
                 D10_port: {type: "text"},
-                D10_isSecure: {type: "boolean"},
+                D10_isSecure: {type: "text"},
                 D10_rootCert: {type: "text"},
                 D10_clientCert: {type: "text"},
                 D10_clientKey: {type: "text"},

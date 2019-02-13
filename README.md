@@ -19,6 +19,9 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/).
 
 # **Changes**
+### V 1.0.1 Bug Fixing
+Fixing a bug that prevented the Configuration Node to work with UNsecure Domino Servers.
+
 ### V 1.0.0 Secure Connection and enhancements
 * Now the **dominodb Configuration node** supports <strong style="color:red">secure connections to the Proton server</strong>. You can import, via the Configuration Node, the *certificates* from the **Proton component** 
 * Addressing the [issue reported here](https://github.com/stefanopog/node-red-contrib-dominodb/issues/2)
