@@ -8,7 +8,7 @@ node-red-contrib-dominodb
 [![](https://img.shields.io/npm/v/node-red-contrib-dominodb.svg?style=plastic)](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
 
 A set of node-red nodes to interact with the new [Domino V10+ NodeJS component](https://www.ibm.com/blogs/collaboration-solutions/2018/10/08/everything-need-know-domino-v10-node-js/).
-Meet us at [DestinationDomino](ibm.com/destinationdomino) and follow us at [#DominoForever](https://twitter.com/hashtag/dominoforever)
+Meet us at [DestinationDomino](https://ibm.com/destinationdomino) and follow us at [#DominoForever](https://twitter.com/hashtag/dominoforever)
 
 ![Domino10](help/dominoV10-big.jpg)
 
