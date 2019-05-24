@@ -19,6 +19,9 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/).
 
 # **Changes**
+### V 1.2.1 Compute Options Backward compatibility
+Resetting the default to **NOT Using this option** in order to grant backward compatibility for people not using the latest **App Dev Pack**.
+
 ### V 1.2.0 Compute Options
 * This version introduces support for the **Compute Options** options when appropriate. You can use this new feature <strong style="color:red">ONLY with V1.0.1 of the AppDev pack, both on the client and on the server</strong>.  
 The option is **only available** via the nodes Configuration panels (no support in the incoming <code>msg. ...</code> attributes).

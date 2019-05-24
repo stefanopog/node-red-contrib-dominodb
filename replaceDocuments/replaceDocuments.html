@@ -82,7 +82,7 @@ SPDX-License-Identifier: Apache-2.0
                     required: false
                 },
                 computeWithForm: {
-                    value: true,
+                    value: false,
                     required: false
                 },
                 ignoreComputeErrors: {
@@ -112,9 +112,9 @@ SPDX-License-Identifier: Apache-2.0
     );
     function _D10_replaceDocumentsPrepare() {
         if ((this.computeWithForm === undefined) || (this.computeWithForm === null)) {
-            this.computeWithForm = true;
-            document.querySelector("#node-input-computeWithForm").value = true;
-            document.querySelector("#node-input-computeWithForm").checked = true;
+            this.computeWithForm = false;
+            document.querySelector("#node-input-computeWithForm").value = false;
+            document.querySelector("#node-input-computeWithForm").checked = false;
         }
         if ((this.ignoreComputeErrors === undefined) || (this.ignoreComputeErrors === null)) {
             this.ignoreComputeErrors = false;
