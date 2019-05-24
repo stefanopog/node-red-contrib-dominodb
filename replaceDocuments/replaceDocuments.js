@@ -199,6 +199,16 @@ module.exports = function(RED) {
       //
       bulkCmdConfig.onErrorOptions = config.onError;
       //
+      //  Deal with "computeWithForm"
+      //
+      if (config.computeWithForm) {
+        bulkCmdConfig.computeOptions = {};
+        bulkCmdConfig.computeOptions.computeWithForm = true;
+        if (config.ignoreComputeErrors) {
+          bulkCmdConfig.computeOptions.ignoreComputeErrors = true;
+        }
+      }
+      //
       //  Preparing
       //
       const serverConfig = node.application.getServerConfig();

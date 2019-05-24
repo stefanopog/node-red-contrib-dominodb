@@ -18,6 +18,14 @@ SPDX-License-Identifier: Apache-2.0
                     value: "",
                     required: false
                 },
+                computeWithForm: {
+                    value: true,
+                    required: false
+                },
+                ignoreComputeErrors: {
+                    value: false,
+                    required: false
+                },
                 onError: {
                     value: "ON_ERROR_CONTINUE",
                     required: true
@@ -34,9 +42,31 @@ SPDX-License-Identifier: Apache-2.0
             },
             paletteLabel: "Create Documents",
             align: "left",
-            oneditprepare: function() {}
+            oneditprepare: function() {
+                _D10_createDocumentsPrepare();
+            }
         }
     );
+    function _D10_createDocumentsPrepare() {
+        if ((this.computeWithForm === undefined) || (this.computeWithForm === null)) {
+            this.computeWithForm = true;
+            document.querySelector("#node-input-computeWithForm").value = true;
+            document.querySelector("#node-input-computeWithForm").checked = true;
+        }
+        if ((this.ignoreComputeErrors === undefined) || (this.ignoreComputeErrors === null)) {
+            this.ignoreComputeErrors = false;
+            document.querySelector("#node-input-ignoreComputeErrors").value = false;
+            document.querySelector("#node-input-ignoreComputeErrors").checked = false;
+        }
+        _D10_createDocumentsComputeWithForm();
+    };
+    function _D10_createDocumentsComputeWithForm() {
+        if (document.querySelector("#node-input-computeWithForm").checked) {
+            document.querySelector("#ignoreComputeErrors").style.display = "block";
+        } else {
+            document.querySelector("#ignoreComputeErrors").style.display = "none";
+        }
+    };
   </script>
   
   <script type="text/x-red" data-template-name="D10_createDocuments">
@@ -45,20 +75,30 @@ SPDX-License-Identifier: Apache-2.0
       <input type="text" id="node-input-application">
     </div>
 
-    <div id="_itemValuesById" style="display:none">
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <div id="_computeOptionsCreateDocuments">
         <div class="form-row">
-            <label for="node-input-itemValuesById" style="width:100px"><i class="fa fa-th-list"></i> Item Values by ID</label>
-            <input type="text" id="node-input-itemValuesById" placeholder="comma-separated list of itemName=itemValue pairs with IDs">
+            <label for="node-input-computeWithForm" style="width:40%"><i class="fa fa-check"></i> Compute With Form</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="computeWithForm" id="node-input-computeWithForm" onchange="_D10_createDocumentsComputeWithForm()"></input>
+        </div>
+        <div class="form-row" id="ignoreComputeErrors">
+            <label for="node-input-ignoreComputeErrors" style="width:40%"><i class="fa fa-check"></i> Ignore Compute Errors</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="ignoreComputeErrors" id="node-input-ignoreComputeErrors"></input>
         </div>
     </div>
-            
+    
     <div class="form-row">
-        <label for="node-input-onError" style="width:100px"><i class="fa fa-stop-circle"></i> OnError</label>
+        <label for="node-input-onError"><i class="fa fa-stop-circle"></i> OnError</label>
         <select id="node-input-onError">
             <option value="ON_ERROR_CONTINUE">Continue...</option>
             <option value="ON_ERROR_ABORT_REMAINING">Abort...</option>
         </select>
     </div>
+
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <br />
 
     <div class="form-row">
       <label for="node-input-name" style="width:100px"><i class="icon-tag"></i> Name</label>
@@ -98,13 +138,9 @@ msg.DDB_itemValuesById[1].description = 'the desc';
 ...
             </pre>
             <br />
-            This attribute is <strong>only cosidered</strong> if the operation is <code>delete documents by unids</code> or <code>delete items by unids</code>. 
-            In these situations, the attribute provides replacement values that apply to each document as specified by the <code>'@unid'</code> attribute.
-            <br /><br />
-            <strong>Note : </strong>If any of the objects in the array <strong>does not</strong> provide the <code>'@unid'</code> attribute, the operation
-            will fail.
-            <br /><br />
             <strong>Note : </strong>If this attribute is not present when required, the operation will fail. 
+            <br />
+            <strong>Note : </strong>You <strong style="color:red">do NOT</strong> need to specify the `['@unid']` attribute because it is going to be created by the operation. 
         </dd>
     <h3>Outputs</h3>
     <dl class="message-properties">

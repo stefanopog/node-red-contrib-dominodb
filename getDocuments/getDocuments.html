@@ -77,6 +77,14 @@ SPDX-License-Identifier: Apache-2.0
                     value: "",
                     required: false
                 },
+                computeWithForm: {
+                    value: true,
+                    required: false
+                },
+                ignoreComputeErrors: {
+                    value: false,
+                    required: false
+                },
                 onError: {
                     value: "ON_ERROR_CONTINUE",
                     required: true
@@ -98,24 +106,38 @@ SPDX-License-Identifier: Apache-2.0
             paletteLabel: "Get Documents",
             align: "left",
             oneditprepare: function() {
-                if (document.querySelector('#node-input-displayResults').value === '') {
-                    $('#node-input-displayResults').val('Default');
-                }
-                _D10_updateQueryOrId();
-                _D10_defaultOptions();
-                _D10_selectDisplayResults();
+                _D10_getDocumentsPrepare();
             }
         }
     );
+    function _D10_getDocumentsPrepare() {
+        if ((this.computeWithForm === undefined) || (this.computeWithForm === null)) {
+            this.computeWithForm = true;
+            document.querySelector("#node-input-computeWithForm").value = true;
+            document.querySelector("#node-input-computeWithForm").checked = true;
+        }
+        if ((this.ignoreComputeErrors === undefined) || (this.ignoreComputeErrors === null)) {
+            this.ignoreComputeErrors = false;
+            document.querySelector("#node-input-ignoreComputeErrors").value = false;
+            document.querySelector("#node-input-ignoreComputeErrors").checked = false;
+        }
+        if (document.querySelector('#node-input-displayResults').value === '') {
+            $('#node-input-displayResults').val('Default');
+        }
+        _D10_updateQueryOrId();
+        _D10_defaultOptions();
+        _D10_selectDisplayResults();
+        _D10_getDocumentsComputeWithForm();
+    }
     function _D10_updateQueryOrId() {
         switch (document.querySelector("#node-input-queryOrId").value) {
             case 'query' :
-	            document.querySelector("#_byQuery").style.display = "inline";
+	            document.querySelector("#_byQuery").style.display = "block";
                 document.querySelector("#_byDocunids").style.display = "none";
                 break;
             case 'ids' :
                 document.querySelector("#_byQuery").style.display = "none";
-                document.querySelector("#_byDocunids").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
                 break;
             default:
                 document.querySelector("#_byQuery").style.display = "none";
@@ -128,7 +150,7 @@ SPDX-License-Identifier: Apache-2.0
         if (document.querySelector("#node-input-defaultOptions").checked){ 
             document.querySelector("#_defaultOptions").style.display = "none"; 
         } else { 
-            document.querySelector("#_defaultOptions").style.display = "inline"; 
+            document.querySelector("#_defaultOptions").style.display = "block"; 
         } 
     };
 
@@ -136,13 +158,20 @@ SPDX-License-Identifier: Apache-2.0
         switch (document.querySelector('#node-input-displayResults').value) {
             case 'byPage' :
             case 'fromMsg' :
-                document.querySelector('#_byPage').style.display = 'inline';
+                document.querySelector('#_byPage').style.display = 'block';
                 break;
             case 'Default' :
             case 'All' :
             default :
                 document.querySelector('#_byPage').style.display = 'none';
                 break;
+        }
+    };
+    function _D10_getDocumentsComputeWithForm() {
+        if (document.querySelector("#node-input-computeWithForm").checked) {
+            document.querySelector("#ignoreComputeErrors").style.display = "block";
+        } else {
+            document.querySelector("#ignoreComputeErrors").style.display = "none";
         }
     };
   </script>
@@ -225,6 +254,19 @@ SPDX-License-Identifier: Apache-2.0
         <input type="text" id="node-input-itemNames" placeholder="comma-separated list of item Names">
     </div>
 
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <div id="_computeOptionsGetDocuments">
+        <div class="form-row">
+            <label for="node-input-computeWithForm" style="width:40%"><i class="fa fa-check"></i> Compute With Form</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="computeWithForm" id="node-input-computeWithForm" onchange="_D10_getDocumentsComputeWithForm()"></input>
+        </div>
+        <div class="form-row" id="ignoreComputeErrors">
+            <label for="node-input-ignoreComputeErrors" style="width:40%"><i class="fa fa-check"></i> Ignore Compute Errors</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="ignoreComputeErrors" id="node-input-ignoreComputeErrors"></input>
+        </div>
+    </div>
+    
     <div class="form-row">
         <label for="node-input-onError"><i class="fa fa-stop-circle"></i> OnError</label>
         <select id="node-input-onError">
@@ -232,6 +274,10 @@ SPDX-License-Identifier: Apache-2.0
             <option value="ON_ERROR_ABORT_REMAINING">Abort...</option>
         </select>
     </div>
+
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <br />
 
     <div class="form-row">
       <label for="node-input-name"><i class="icon-tag"></i> Name</label>
@@ -248,13 +294,15 @@ SPDX-License-Identifier: Apache-2.0
         list of documents by their <b>unids</b>) APIs via the <b>Type selector</b> in the Configuration Panel or via the <code>msg.DDB_queryOrId</code> input 
         parameter.
         <br />
-        When a <strong>DQL Query</strong> is selected, the query can return:
+        When a <strong>DQL Query</strong> is selected, the operation can return many records. The number of records can be controlled by the <strong>displayResults</strong> 
+        selector (or by the <code>msg.DDB_displayResults</code> input parameter) as follows:
         <ul>
             <li>the <strong>Default</strong> number of Documents (as specified by the API)
             </li>
             <li><strong>All</strong> the documents matching the query
             </li>
-            <li>a <strong>subset</strong> of Documents specified by the <code>start</code> and <code>count</code> parameters
+            <li>a <strong>subset</strong> of Documents specified by the <code>msg.DDB_startValue</code> and <code>msg.DDB_countValue</code> parameters (or the euqivalent
+                Configuration Panel inputs)
             </li>
         </ul>
     </p>

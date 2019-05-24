@@ -66,12 +66,12 @@ RED.nodes.registerType(
             paletteLabel: "DEPRECATED Get Documents",
             align: "left",
             oneditprepare: function() {
-                _D10_updateQueryOrId();
-                _D10_defaultOptions();
+                _D10OLD_updateQueryOrId();
+                _D10OLD_defaultOptions();
             }
         }
     );
-    function _D10_updateQueryOrId() {
+    function _D10OLD_updateQueryOrId() {
         switch (document.querySelector("#node-input-queryOrId").value) {
             case 'query' :
 	            document.querySelector("#_byQuery").style.display = "inline";
@@ -88,7 +88,7 @@ RED.nodes.registerType(
        }
     };
 
-    function _D10_defaultOptions() {
+    function _D10OLD_defaultOptions() {
         if (document.querySelector("#node-input-defaultOptions").checked){ 
             document.querySelector("#_defaultOptions").style.display = "none"; 
         } else { 
@@ -105,7 +105,7 @@ RED.nodes.registerType(
 
     <div class="form-row">
         <label for="node-input-queryOrId"><i class="fa fa-arrow-circle-right"></i> Type</label>
-        <select id="node-input-queryOrId" onchange="_D10_updateQueryOrId()">
+        <select id="node-input-queryOrId" onchange="_D10OLD_updateQueryOrId()">
             <option value="query">By Query</option>
             <option value="ids">By docunids</option>
             <option value="fromMsg">--set from msg.DDB_queryOrId--</option>
@@ -120,7 +120,7 @@ RED.nodes.registerType(
 
         <div class="form-row">
             <label for="node-input-defaultOptions" style="width:30%"><i class="fa fa-check"></i> Default Options</label>
-            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="defaultOptions" id="node-input-defaultOptions" onchange="_D10_defaultOptions()"></input>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="defaultOptions" id="node-input-defaultOptions" onchange="_D10OLD_defaultOptions()"></input>
         </div>
         
         <div id="_defaultOptions">            

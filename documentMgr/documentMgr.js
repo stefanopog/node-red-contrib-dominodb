@@ -110,7 +110,7 @@ module.exports = function(RED) {
           break;
       }
       //
-      //  Preparing
+      //  Preparing Options
       //
       switch (documentOp) {
         case 'read':
@@ -131,6 +131,18 @@ module.exports = function(RED) {
         case 'deleteItems':
           options = {itemNames : itemNames};
           break;
+      }
+      //
+      //  Deal with "computeWithForm"
+      //
+      if (documentOp !== 'delete') {
+        if (config.computeWithForm) {
+          options.computeOptions = {};
+          options.computeOptions.computeWithForm = true;
+          if (config.ignoreComputeErrors) {
+            options.computeOptions.ignoreComputeErrors = true;
+          }
+        }
       }
       const serverConfig = node.application.getServerConfig();
       const databaseConfig = node.application.getDatabaseConfig();

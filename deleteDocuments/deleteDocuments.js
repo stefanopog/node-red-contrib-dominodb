@@ -163,6 +163,18 @@ module.exports = function(RED) {
       if (itemNames && Array.isArray(itemNames) && (itemNames.length > 0)) bulkCmdConfig.itemNames = itemNames;
       bulkCmdConfig.onErrorOptions = config.onError;
       //
+      //  Deal with "computeWithForm"
+      //
+      if (documentsOrItems === 'items') {
+        if (config.computeWithForm) {
+          bulkCmdConfig.computeOptions = {};
+          bulkCmdConfig.computeOptions.computeWithForm = true;
+          if (config.ignoreComputeErrors) {
+            bulkCmdConfig.computeOptions.ignoreComputeErrors = true;
+          }
+        }
+      }
+      //
       //  Preparing
       //
       const serverConfig = node.application.getServerConfig();

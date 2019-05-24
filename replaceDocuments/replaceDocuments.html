@@ -81,8 +81,12 @@ SPDX-License-Identifier: Apache-2.0
                     value: "",
                     required: false
                 },
-                itemValuesById: {
-                    value: "",
+                computeWithForm: {
+                    value: true,
+                    required: false
+                },
+                ignoreComputeErrors: {
+                    value: false,
                     required: false
                 },
                 onError: {
@@ -102,16 +106,30 @@ SPDX-License-Identifier: Apache-2.0
             paletteLabel: "Replace Docs/Items",
             align: "left",
             oneditprepare: function() {
-                if (document.querySelector('#node-input-displayResults').value === '') {
-                    $('#node-input-displayResults').val('Default');
-                }
-                _D10_updateQueryOrId_replace();
-                _D10_updateDocumentsOrItems_replace();
-                _D10_defaultOptions_replace();
-                _D10_selectDisplayResults_replace();
+                _D10_replaceDocumentsPrepare();
             }
         }
     );
+    function _D10_replaceDocumentsPrepare() {
+        if ((this.computeWithForm === undefined) || (this.computeWithForm === null)) {
+            this.computeWithForm = true;
+            document.querySelector("#node-input-computeWithForm").value = true;
+            document.querySelector("#node-input-computeWithForm").checked = true;
+        }
+        if ((this.ignoreComputeErrors === undefined) || (this.ignoreComputeErrors === null)) {
+            this.ignoreComputeErrors = false;
+            document.querySelector("#node-input-ignoreComputeErrors").value = false;
+            document.querySelector("#node-input-ignoreComputeErrors").checked = false;
+        }
+        if (document.querySelector('#node-input-displayResults').value === '') {
+            $('#node-input-displayResults').val('Default');
+        }
+        _D10_updateQueryOrId_replace();
+        _D10_updateDocumentsOrItems_replace();
+        _D10_defaultOptions_replace();
+        _D10_selectDisplayResults_replace();
+        _D10_replaceDocumentsComputeWithForm();
+    };
     function _D10_updateQueryOrId_replace() {
         switch (document.querySelector("#node-input-queryOrId").value) {
             case 'query' :
@@ -120,12 +138,10 @@ SPDX-License-Identifier: Apache-2.0
                         //
                         //  THIS IS NOT A VALID CHOICE  (documents by query !!!)
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "none";
                         document.querySelector("#_byQuery").style.display = "none";
                         break;
                     case 'items':
-                        //document.querySelector("#_itemValuesById").style.display = "none";
                         document.querySelector("#_itemValues").style.display = "inline";
                         document.querySelector("#_byQuery").style.display = "inline";
                         break;
@@ -135,7 +151,6 @@ SPDX-License-Identifier: Apache-2.0
                         //  as we are choosing a query, the only possibility is to treat this as if 
                         //  it was a 'items' (as only items can have a query)
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "none";
                         document.querySelector("#_itemValues").style.display = "inline";
                         document.querySelector("#_byQuery").style.display = "inline";
                         break;
@@ -148,11 +163,9 @@ SPDX-License-Identifier: Apache-2.0
                         //
                         //  In this case, replaceDocumentsByUnid only supports itemValuesById
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "none";
                         break;
                     case 'items':
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
                         break;
                     default:
@@ -160,7 +173,6 @@ SPDX-License-Identifier: Apache-2.0
                         //  if the choice between documents or items is specified by the incoming message,
                         //  as we are choosing a 'IDs', the only possibility is to give complete freedom
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
                         break;
                 }
@@ -174,12 +186,10 @@ SPDX-License-Identifier: Apache-2.0
                         //
                         //  In this case, replaceDocumentsByUnid only supports itemValuesById
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "none";
                         document.querySelector("#_byQuery").style.display = "none";
                         break;
                     case 'items':
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
                         document.querySelector("#_byQuery").style.display = "inline";
                         break;
@@ -189,7 +199,6 @@ SPDX-License-Identifier: Apache-2.0
                         //  and also the choice between 'query' or 'ids' is specified by the incoming message,
                         //  then we give complete freedom
                         //
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
                         document.querySelector("#_byQuery").style.display = "inline";
                         break;
@@ -208,7 +217,6 @@ SPDX-License-Identifier: Apache-2.0
                 document.querySelector("#node-input-queryOrId").value = "ids";
                 document.querySelector("#_byQuery").style.display = "none";
                 document.querySelector("#_itemValues").style.display = "none";
-                //document.querySelector("#_itemValuesById").style.display = "inline";
                 break;
             case 'items' :
                 document.querySelector("#_queryOrId").style.display = "inline";
@@ -216,17 +224,14 @@ SPDX-License-Identifier: Apache-2.0
                     case 'query':
                         document.querySelector("#_byQuery").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
-                        //document.querySelector("#_itemValuesById").style.display = "none";
                         break;
                     case 'ids':
                         document.querySelector("#_byQuery").style.display = "none";
                         document.querySelector("#_itemValues").style.display = "inline";
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         break;
                     default:
                         document.querySelector("#_byQuery").style.display = "inline";
                         document.querySelector("#_itemValues").style.display = "inline";
-                        //document.querySelector("#_itemValuesById").style.display = "inline";
                         break;
                 }
                 break;
@@ -237,7 +242,6 @@ SPDX-License-Identifier: Apache-2.0
                 document.querySelector("#_queryOrId").style.display = "inline";
                 document.querySelector("#_byQuery").style.display = "inline";
                 document.querySelector("#_itemValues").style.display = "inline";
-                //document.querySelector("#_itemValuesById").style.display = "inline";
                 break;
        }
     };
@@ -261,6 +265,13 @@ SPDX-License-Identifier: Apache-2.0
             default :
                 document.querySelector('#_byPage').style.display = 'none';
                 break;
+        }
+    };
+    function _D10_replaceDocumentsComputeWithForm() {
+        if (document.querySelector("#node-input-computeWithForm").checked) {
+            document.querySelector("#ignoreComputeErrors").style.display = "block";
+        } else {
+            document.querySelector("#ignoreComputeErrors").style.display = "none";
         }
     };
   </script>
@@ -349,20 +360,30 @@ SPDX-License-Identifier: Apache-2.0
         </div>
     </div>
 
-    <div id="_itemValuesById" style="display:none">
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <div id="_computeOptionsReplaceDocuments">
         <div class="form-row">
-            <label for="node-input-itemValuesById" style="width:100px"><i class="fa fa-th-list"></i> Item Values by ID</label>
-            <input type="text" id="node-input-itemValuesById" placeholder="comma-separated list of itemName=itemValue pairs with IDs">
+            <label for="node-input-computeWithForm" style="width:40%"><i class="fa fa-check"></i> Compute With Form</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="computeWithForm" id="node-input-computeWithForm" onchange="_D10_replaceDocumentsComputeWithForm()"></input>
+        </div>
+        <div class="form-row" id="ignoreComputeErrors">
+            <label for="node-input-ignoreComputeErrors" style="width:40%"><i class="fa fa-check"></i> Ignore Compute Errors</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="ignoreComputeErrors" id="node-input-ignoreComputeErrors"></input>
         </div>
     </div>
-            
+    
     <div class="form-row">
-        <label for="node-input-onError" style="width:100px"><i class="fa fa-stop-circle"></i> OnError</label>
+        <label for="node-input-onError"><i class="fa fa-stop-circle"></i> OnError</label>
         <select id="node-input-onError">
             <option value="ON_ERROR_CONTINUE">Continue...</option>
             <option value="ON_ERROR_ABORT_REMAINING">Abort...</option>
         </select>
     </div>
+
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <br />
 
     <div class="form-row">
       <label for="node-input-name" style="width:100px"><i class="icon-tag"></i> Name</label>
@@ -446,6 +467,15 @@ SPDX-License-Identifier: Apache-2.0
             The array should have the following structure:
             <br />
             <pre>
+msg.DDB_itemValues = {};
+msg.DDB_itemValues.ActionDate = 
+    {type : 'datetime', data : X.toISOString().substring(0,19)+'Z'};
+msg.DDB_itemValues.alfa = 'tata';
+msg.DDB_itemValues.theNumber = 123.45;
+...
+            </pre>
+            The old format is still supported:
+            <pre>
 msg.DDB_itemValues = [];
 msg.DDB_itemValues[0] = {};
 msg.DDB_itemValues[0].name = 'the name of the item' ;
@@ -453,7 +483,7 @@ msg.DDB_itemValues[0].value = 'the value for the item' ;
 ...
             </pre>
             <br />
-            This attribute is <strong>only cosidered</strong> if the operation is <code>delete items by query</code> or <code>delete items by unids</code>. In these
+            This attribute is <strong>only cosidered</strong> if the operation is <code>replace items by query</code> or <code>replace items by unids</code>. In these
             situations, the attribute provides replacement values that apply to each document that is selected by the <strong>DQL query</strong> or by the 
             <strong>list of unids</strong>.
             <br /><br />
@@ -462,7 +492,7 @@ msg.DDB_itemValues[0].value = 'the value for the item' ;
             <strong>Note : </strong>If using the Configuration Panel, the overall value of the attribute is a <strong>comma separated list</strong> of 
             <code>name = value</code> pairs. The algorithm splits first on <code>, (comma)</code> and, then, on <code>= (equal sign)</code>. 
             <br /><br />
-            <strong>Note : </strong>If the attribute is not present, then the <code>delete items by query</code> operation will fail. If the <code>delete items by unids</code>
+            <strong>Note : </strong>If the attribute is not present, then the <code>replace items by query</code> operation will fail. If the <code>replace items by unids</code>
             operation is chosen, then the operation will continue
         </dd>
 
@@ -485,7 +515,7 @@ msg.DDB_itemValuesById[1]['@unid'] = "..."
 ...
             </pre>
             <br />
-            This attribute is <strong>only cosidered</strong> if the operation is <code>delete documents by unids</code> or <code>delete items by unids</code>. 
+            This attribute is <strong>only cosidered</strong> if the operation is <code>replace documents by unids</code> or <code>replace items by unids</code>. 
             In these situations, the attribute provides replacement values that apply to each document as specified by the <code>'@unid'</code> attribute.
             <br /><br />
             <strong>Note : </strong>If any of the objects in the array <strong>does not</strong> provide the <code>'@unid'</code> attribute, the operation

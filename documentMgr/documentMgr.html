@@ -30,6 +30,14 @@ SPDX-License-Identifier: Apache-2.0
                     value: "",
                     required: false
                 },
+                computeWithForm: {
+                    value: true,
+                    required: false
+                },
+                ignoreComputeErrors: {
+                    value: false,
+                    required: false
+                },
                 name: { 
                     value: "" 
                 }
@@ -43,48 +51,78 @@ SPDX-License-Identifier: Apache-2.0
             paletteLabel: "Document Mgr",
             align: "left",
             oneditprepare: function() {
-                _D10_documentOperation();
+                _D10_documentMgrPrepare();
             }
         }
     );
-    function _D10_documentOperation() {
+
+    function _D10_documentMgrPrepare() {
+        if ((this.computeWithForm === undefined) || (this.computeWithForm === null)) {
+            this.computeWithForm = true;
+            document.querySelector("#node-input-computeWithForm").value = true;
+            document.querySelector("#node-input-computeWithForm").checked = true;
+        }
+        if ((this.ignoreComputeErrors === undefined) || (this.ignoreComputeErrors === null)) {
+            this.ignoreComputeErrors = false;
+            document.querySelector("#node-input-ignoreComputeErrors").value = false;
+            document.querySelector("#node-input-ignoreComputeErrors").checked = false;
+        }
+        _D10_documentMgrOperation();
+        _D10_documentMgrComputeWithForm();
+    }
+    function _D10_documentMgrOperation() {
         switch (document.querySelector("#node-input-documentOp").value) {
             case 'read' :
-                document.querySelector("#_byDocunids").style.display = "inline";
-	            document.querySelector("#_docItemNames").style.display = "inline";
-	            document.querySelector("#_docItemValues").style.display = "none";
+                document.querySelector("#_byDocunids").style.display = "block";
+	            document.querySelector("#_docItemNames").style.display = "block";
+                document.querySelector("#_docItemValues").style.display = "none";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
                 break;
             case 'delete' :
-                document.querySelector("#_byDocunids").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
 	            document.querySelector("#_docItemNames").style.display = "none";
 	            document.querySelector("#_docItemValues").style.display = "none";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "none";
                 break;
             case 'replace' :
-                document.querySelector("#_byDocunids").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
 	            document.querySelector("#_docItemNames").style.display = "none";
-	            document.querySelector("#_docItemValues").style.display = "inline";
-                break;
+	            document.querySelector("#_docItemValues").style.display = "block";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
+               break;
             case 'create' :
                 document.querySelector("#_byDocunids").style.display = "none";
 	            document.querySelector("#_docItemNames").style.display = "none";
-	            document.querySelector("#_docItemValues").style.display = "inline";
+	            document.querySelector("#_docItemValues").style.display = "block";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
                 break;
             case 'replaceItems' :
-                document.querySelector("#_byDocunids").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
 	            document.querySelector("#_docItemNames").style.display = "none";
-	            document.querySelector("#_docItemValues").style.display = "inline";
+	            document.querySelector("#_docItemValues").style.display = "block";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
                 break;
             case 'deleteItems' :
-                document.querySelector("#_byDocunids").style.display = "inline";
-	            document.querySelector("#_docItemNames").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
+	            document.querySelector("#_docItemNames").style.display = "block";
 	            document.querySelector("#_docItemValues").style.display = "none";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
                 break;
             case 'fromMsg' :
-                document.querySelector("#_byDocunids").style.display = "inline";
+                document.querySelector("#_byDocunids").style.display = "block";
 	            document.querySelector("#_docItemNames").style.display = "none";
 	            document.querySelector("#_docItemValues").style.display = "none";
+                document.querySelector("#_computeOptionsDocMgr").style.display = "block";
                 break;
        }
+    };
+
+    function _D10_documentMgrComputeWithForm() {
+        if (document.querySelector("#node-input-computeWithForm").checked) {
+            document.querySelector("#ignoreComputeErrors").style.display = "block";
+        } else {
+            document.querySelector("#ignoreComputeErrors").style.display = "none";
+        }
     };
   </script>
   
@@ -96,7 +134,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <div class="form-row">
         <label for="node-input-documentOp"><i class="fa fa-arrow-circle-right"></i> Operation</label>
-        <select id="node-input-documentOp" onchange="_D10_documentOperation()">
+        <select id="node-input-documentOp" onchange="_D10_documentMgrOperation()">
             <option value="read">Read Document</option>
             <option value="replace">Replace Document</option>
             <option value="delete">Delete Document</option>
@@ -122,6 +160,22 @@ SPDX-License-Identifier: Apache-2.0
         <input type="text" id="node-input-itemValues" placeholder="comma-separated list of itemName=itemValue pairs">
     </div>
 
+    <div id="_computeOptionsDocMgr">
+        <br />
+        <hr style="margin:5px; border-color:black"/>
+        <div class="form-row">
+            <label for="node-input-computeWithForm" style="width:40%"><i class="fa fa-check"></i> Compute With Form</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="computeWithForm" id="node-input-computeWithForm" onchange="_D10_documentMgrComputeWithForm()"></input>
+        </div>
+        <div class="form-row" id="ignoreComputeErrors">
+            <label for="node-input-ignoreComputeErrors" style="width:40%"><i class="fa fa-check"></i> Ignore Compute Errors</label>
+            <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="ignoreComputeErrors" id="node-input-ignoreComputeErrors"></input>
+        </div>
+    </div>
+
+    <br />
+    <hr style="margin:5px; border-color:black"/>
+    <br />
 
     <div class="form-row">
       <label for="node-input-name"><i class="icon-tag"></i> Name</label>
@@ -219,6 +273,15 @@ SPDX-License-Identifier: Apache-2.0
             <br />
             The array should have the following structure:
             <br />
+            <pre>
+msg.DDB_itemValues = {};
+msg.DDB_itemValues.ActionDate = 
+    {type : 'datetime', data : X.toISOString().substring(0,19)+'Z'};
+msg.DDB_itemValues.alfa = 'tata';
+msg.DDB_itemValues.theNumber = 123.45;
+...
+            </pre>
+            The old format is still supported:
             <pre>
 msg.DDB_itemValues = [];
 msg.DDB_itemValues[0] = {};
