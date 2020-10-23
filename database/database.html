@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
             category: "config",
             inputs: 1,
             outputs: 1,
-            icon: "dominoV10.png",
+            icon: "HCL_Domino_dark.png",
             color: "#F3CD4E",
             paletteLabel: "Database",
             label: function() {
@@ -215,52 +215,52 @@ SPDX-License-Identifier: Apache-2.0
         <input type="text" id="node-config-input-D10_server" placeholder="myorg.mydomain.com for instance...">
     </div>
     <div class="form-row">
-        <label for="node-config-input-D10_port" title="The Domino10 server port"><i class="fa fa-location-arrow"></i> Port</label>
+        <label for="node-config-input-D10_port" title="The Domino10 server port"><i class="fa fa-location-arrow"></i>
+            Port</label>
         <input type="text" id="node-config-input-D10_port" placeholder="17847 for instance">
     </div>
     <div class="form-row">
         <label for="node-config-input-D10_db" title="The Domino10 Database."><i class="fa fa-database"></i> Database</label>
         <input type="text" id="node-config-input-D10_db" placeholder="myDir/myDB.nsf for instance...">
     </div>
-
-
+    
+    
     <div class="form-row">
         <label for="node-config-input-D10_isSecure"><i class="fa fa-check"></i> Secure </label>
-        <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="isSecure" id="node-config-input-D10_isSecure" onchange="_D10_isSecure()"></input>
+        <input style="display: inline-block; width: auto; vertical-align: top;" type="checkbox" name="isSecure"
+            id="node-config-input-D10_isSecure" onchange="_D10_isSecure()"></input>
     </div>
-
+    
     <div id="securityPanel">
         <div class="form-row" id="uploadRootCert">
             <label for="node-config-input-D10_rootCert" title="Root Certificate"><i class="fas fa-chess-rook"></i> Root Cert</label>
-            <i class="fa fa-check-circle" id="_rootCert-isDone" />
+            <i class="fa fa-check-circle" id="_rootCert-isDone"></i>
             <a class="editor-button" id="_rootCert-upload"><i class="fa fa-upload"></i></a>
-            <input type="file" id="_rootCert" accept=".crt" onchange="_D10_getRootCert()">
-            <!-- <input type="text" id="node-config-input-D10_rootCert" style="display:inline">  -->
+            <input type="file" id="_rootCert" accept=".crt" onchange="_D10_getRootCert()" />
             <textArea rows="4" cols="50" id="node-config-input-D10_rootCert" style="display:none"> </textArea>
         </div>
-
+    
         <div class="form-row" id="uploadClientCert">
             <label for="node-config-input-D10_clientCert" title="Client Certificate"><i class="fas fa-certificate"></i> Client Cert</label>
-            <i class="fa fa-check-circle" id="_clientCert-isDone" />
+            <i class="fa fa-check-circle" id="_clientCert-isDone"></i>
             <a class="editor-button" id="_clientCert-upload"><i class="fa fa-upload"></i></a>
-            <input type="file" id="_clientCert" accept=".crt" onchange="_D10_getClientCert()">
-            <!-- <input type="text" id="node-config-input-D10_clientCert" style="display:inline">  -->
+            <input type="file" id="_clientCert" accept=".crt" onchange="_D10_getClientCert()" />
             <textArea rows="4" cols="50" id="node-config-input-D10_clientCert" style="display:none"> </textArea>
         </div>
-
+    
         <div class="form-row" id="uploadClientKey">
             <label for="node-config-input-D10_clientKey" title="Client Key"><i class="fas fa-key"></i> Client Key</label>
-            <i class="fa fa-check-circle" id="_clientKey-isDone" />
+            <i class="fa fa-check-circle" id="_clientKey-isDone"></i>
             <a class="editor-button" id="_clientKey-upload"><i class="fa fa-upload"></i></a>
-            <input type="file" id="_clientKey" accept=".key" onchange="_D10_getClientKey()">
-            <!-- <input type="text" id="node-config-input-D10_clientKey" style="display:inline">  -->
+            <input type="file" id="_clientKey" accept=".key" onchange="_D10_getClientKey()" />
             <textArea rows="4" cols="50" id="node-config-input-D10_clientKey" style="display:none"> </textArea>
         </div>
     </div>
     <hr />
     <div class="form-row">
         <label for="node-config-input-displayName" title="App Name"><i class="fa fa-tag"></i> AppName</label>
-        <input type="text" id="node-config-input-displayName" autocomplete="off" placeholder="A name that would remember you this instance">
+        <input type="text" id="node-config-input-displayName" autocomplete="off"
+            placeholder="A name that would remember you this instance">
     </div>
 </script>
 

@@ -4,13 +4,14 @@ node-red-contrib-dominodb
 
 [![](https://img.shields.io/npm/dt/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
 [![](https://img.shields.io/npm/dw/node-red-contrib-dominodb.svg?style=flat-square)](https://www.npmjs.com/package/node-red-contrib-dominodb)
-[![Domino10](https://img.shields.io/badge/Platform-Domino-%23FEC70B.svg)](http://ibm.com/destinationdomino)
-[![](https://img.shields.io/npm/v/node-red-contrib-dominodb.svg?style=plastic)](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
+[![DAomino10](https://img.shields.io/badge/Platform-Domino-%23FEC70B.svg)](https://www.hcltechsw.com/products/domino)
+[![](https://img.shields.io/badge/dominoDb-documentation-%23FEC70B)](https://stefanopog.github.io/node-red-contrib-dominodb-docs/)
 
-A set of node-red nodes to interact with the new [Domino V10+ NodeJS component](https://www.ibm.com/blogs/collaboration-solutions/2018/10/08/everything-need-know-domino-v10-node-js/).
-Meet us at [DestinationDomino](https://ibm.com/destinationdomino) and follow us at [#DominoForever](https://twitter.com/hashtag/dominoforever)
+A set of node-red nodes to interact with the new [Domino V10+ NodeJS component](https://doc.cwpcollaboration.com/appdevpack/docs/en/homepage.html).
 
-![Domino10](help/dominoV10-big.jpg)
+Meet us at [HCL Domino](https://www.hcltechsw.com/products/domino) and follow us at [#DominoForever](https://twitter.com/hashtag/dominoforever)
+
+![Domino10](help/HCL_Domino_dark@3x.png)
 
 # **Purpose**
 This set of nodes is intended to be provide a simple-to-use NodeRED interface to the the **dominodb nodeJS package**.
@@ -19,6 +20,10 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/).
 
 # **Changes**
+### V 1.2.2 Compatibility with new version of NodeRed
+Change in the **database node** user interface to comply with the new version of NodeRed.
+Changes in this README file to move to the HCL branding.
+
 ### V 1.2.1 Compute Options Backward compatibility
 Resetting the default to **NOT Using this option** in order to grant backward compatibility for people not using the latest **App Dev Pack**.
 
