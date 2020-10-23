@@ -20,7 +20,7 @@ As such, it assumes that the  **dominodb nodeJS package** is already installed [
 Full documentation, including sample NodeRed flows using these nodes, is available [here](https://stefanopog.github.io/node-red-contrib-dominodb-docs/).
 
 # **Changes**
-### V 1.2.2 Compatibility with new version of NodeRed
+### V 1.2.4 Compatibility with new version of NodeRed
 Change in the **database node** user interface to comply with the new version of NodeRed.
 Changes in this README file to move to the HCL branding.
 
